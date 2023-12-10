@@ -50,3 +50,5 @@ Clients have the option to provide detailed feedback, sharing their experiences 
 Customers can give badges to electricians, plumbers, and other experts based on the quality of their work, punctuality, communication, and general happiness and satisfaction to a feedback system that is customized to the particular talents of the workers.
 The platform makes the combined ratings and evaluations accessible to the clients or public, providing new customers with important information about the standing and trust of each qualified worker.
 Client can also provide a brief feedback on the platform for that particular worker and give suggestions for improvement to enhance their skills.
+
+![Alt text](<Diagram Job Feedback.jpg>)
