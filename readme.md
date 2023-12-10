@@ -4,7 +4,7 @@
 
 ## Use Cases
 
-### Use Case #03: Hire Crafter
+### Use Case #02: Hire Crafter
 
 This use case elaborates the scenario for the hiring of crafters/skilled workers by the recruiters/clients.
 
