@@ -17,7 +17,7 @@ These functionalities enable crafters to build comprehensive profiles showcasing
 ![Alt text](image.png)
 
 
-### Use Case #03: Hire Crafter
+### Use Case #02: Hire Crafter
 
 This use case elaborates the scenario for the hiring of crafters/skilled workers by the recruiters/clients.
 
