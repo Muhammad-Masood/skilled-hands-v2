@@ -21,3 +21,11 @@ export type Profile = {
     name: string;
     bio: string;
     domain: string;
+}
+
+export interface ReviewDetails {
+  rating: number;
+  //Crafter Reviwes Details
+  id: number;
+  review: number;
+}
