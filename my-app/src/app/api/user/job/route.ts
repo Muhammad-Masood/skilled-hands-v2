@@ -1,8 +1,12 @@
 import { db } from "@/firebase";
 import { Job } from "@/lib/types";
 import {
+  DocumentData,
+  DocumentReference,
+  DocumentSnapshot,
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   setDoc,
@@ -11,6 +15,8 @@ import {
 import { NextRequest, NextResponse } from "next/server";
 
 // http://localhost:3000/api/user/job
+
+// Job CRUD Operations
 
 // Publish Job Details
 export async function POST(request: NextRequest) {
@@ -23,7 +29,7 @@ export async function POST(request: NextRequest) {
     const jobCollectionRef = collection(db, "jobs");
     const storeJobDetailsDocRef = await addDoc(
       jobCollectionRef,
-      jobDetailsData
+      jobDetailsData,
     );
     const jobDocRef = doc(db, "jobs", storeJobDetailsDocRef.id);
     const updateJobId = await updateDoc(jobDocRef, {
@@ -45,8 +51,10 @@ export async function GET(request: NextRequest) {
   try {
     const id: string | null = request.nextUrl.searchParams.get("id");
     if (id) {
-      const jobDetailsDocRef = doc(db, "jobs", id);
-      const jobDetailsData = await getDoc(jobDetailsDocRef);
+      const jobDetailsDocRef: DocumentReference<DocumentData, DocumentData> =
+        doc(db, "jobs", id);
+      const jobDetailsData: DocumentSnapshot<DocumentData, DocumentData> =
+        await getDoc(jobDetailsDocRef);
       console.log(jobDetailsData.data());
       if (jobDetailsData.exists()) {
         return NextResponse.json(jobDetailsData.data());
@@ -59,5 +67,63 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.log(error);
     return NextResponse.json({ error: JSON.stringify(error) });
+  }
+}
+
+interface JobUpdateBody {
+  id: string;
+  title: string;
+  desc: string;
+  location: string;
+  contact: number;
+  pay?: number;
+}
+
+// Update Job Details
+export async function PATCH(request: NextRequest) {
+  try {
+    const id = request.nextUrl.searchParams.get("id");
+    const { title, desc, location, contact, pay }: JobUpdateBody =
+      await request.json();
+    if (id) {
+      const jobDocRef = doc(db, "jobs", id);
+      await updateDoc(jobDocRef, {
+        title: title,
+        desc: desc,
+        location: location,
+        contact: contact,
+        pay: pay,
+      });
+      return NextResponse.json({
+        message: "Job Updated Successfully",
+        data: id,
+      });
+    } else {
+      return NextResponse.json({ error: "Job id not found :/" });
+    }
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json({ error: "something went wrong!" });
+  }
+}
+
+// Delete Job Details
+export async function DELETE(request: NextRequest) {
+  try {
+    const jobId: string | null = request.nextUrl.searchParams.get("id");
+    if (jobId) {
+      const jobDocRef: DocumentReference<DocumentData, DocumentData> = doc(
+        db,
+        "jobs",
+        jobId,
+      );
+      await deleteDoc(jobDocRef);
+      return NextResponse.json({ messag: `Deleted job with id ${jobId}` });
+    } else {
+      return NextResponse.json({ message: "id not found:/" });
+    }
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json({ error: error });
   }
 }

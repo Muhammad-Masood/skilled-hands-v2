@@ -9,8 +9,8 @@ export type Job = {
 };
 
 export type Proposal = {
-    crafterId: string;
-    jobId: string;
-    proposal: string;
-    date: Date;
-}
+  crafterId: string;
+  jobId: string;
+  proposal: string;
+  date: Date;
+};
