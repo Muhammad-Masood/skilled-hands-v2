@@ -14,3 +14,8 @@ export type Proposal = {
   proposal: string;
   date: Date;
 };
+
+export type NavbarLink = {
+  name: string;
+  path: string;
+};

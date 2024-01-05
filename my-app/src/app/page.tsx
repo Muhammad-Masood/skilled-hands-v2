@@ -1,11 +1,9 @@
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
+import NavBar from "./components/Navbar";
 
-export default function Home() {
+export default function page() {
   return (
     <div>
-      Landing Page
-      <Button onClick={() => console.log("Submitted")}>Submit</Button>
+      <NavBar />
     </div>
   );
 }
