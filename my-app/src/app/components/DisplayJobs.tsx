@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { JobCard } from "./JobCard";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const DisplayJobs = () => {
   const [jobsData, setJobsData] = useState<Job[]>([]);
@@ -13,16 +14,13 @@ const DisplayJobs = () => {
   useEffect(() => {
     async function fetchJobs() {
       try {
-        toast.loading("Loading jobs...");
         const jobs: Job[] = (await axios.get("/api/user/jobs")).data;
         setJobsData(jobs);
         setIsLoading(false);
       } catch (error: any) {
         setIsLoading(false);
-        toast.error("Error fetching jobs ", error);
-        toast.error("Failed to fetch jobs.");
-      } finally {
-        toast.dismiss();
+        toast.error("Error fetching jobs ");
+        console.log(error);
       }
     }
     fetchJobs();
@@ -32,11 +30,15 @@ const DisplayJobs = () => {
     <div className="space-y-6">
       <p>Available Jobs</p>
       <div className="grid grid-cols-3">
-        {jobsData && jobsData.length > 0
-          ? jobsData.map((job) => (
-              <JobCard jobData={job} key={job.id} variant="small" />
-            ))
-          : !isLoading && <p>No Jobs Available</p>}
+        {isLoading ? (
+          <Skeleton className="w-[350px] h-[180px]" />
+        ) : jobsData && jobsData.length > 0 ? (
+          jobsData.map((job) => (
+            <JobCard jobData={job} key={job.id} variant="small" />
+          ))
+        ) : (
+          !isLoading && <p>No Jobs Available</p>
+        )}
       </div>
     </div>
   );

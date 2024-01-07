@@ -33,11 +33,11 @@ export function NavBar() {
 
   return (
     <div className="py-[2rem]">
-    <div className="hidden lg:block">
-      <div className="flex items-center justify-center space-x-20">
-        <Link href="/" className="">
+      <Link href="/" className="flex items-center justify-center">
           Skilled Hands
         </Link>
+    <div className="hidden lg:block">
+      <div className="flex items-center justify-center space-x-20">
         <div className="flex space-x-4">
           {navbarLinks.map((link: NavbarLink, index: number) => (
             <NavigationMenu key={index} orientation="horizontal">
@@ -73,14 +73,13 @@ export function NavBar() {
           <SheetContent className="w-[230px]">
             <SheetHeader className="gap-y-1">
               {navbarLinks
-                .slice(0, 6)
-                .map((category: NavbarLink, index: number) => (
+                .map((link: NavbarLink, index: number) => (
                   <SheetTitle
                     className=" text-lg"
                     key={index}
                     onClick={() => setOpen(false)}
                   >
-                    <Link href={`/shop/${category.name}`}>{category.name}</Link>
+                    <Link href={link.path}>{link.name}</Link>
                   </SheetTitle>
                 ))}
             </SheetHeader>

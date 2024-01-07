@@ -52,9 +52,9 @@ export async function GET(request: NextRequest) {
       );
       const proposalsData: DocumentSnapshot<DocumentData, DocumentData> =
         await getDoc(proposalDocRef);
-      console.log(jobDetailsData.data());
-      if (jobDetailsData.exists()) {
-        return NextResponse.json(jobDetailsData.data());
+      console.log(proposalsData.data());
+      if (proposalsData.exists()) {
+        return NextResponse.json(proposalsData.data());
       } else {
         return NextResponse.json({ message: "No Job Details Found" });
       }

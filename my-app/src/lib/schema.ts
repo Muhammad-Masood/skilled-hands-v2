@@ -7,3 +7,7 @@ export const jobFormSchema = z.object({
   contact: z.coerce.number().min(11, { message: "Invalid contact" }),
   pay: z.coerce.number().min(2, { message: "Pay is required" }),
 });
+
+export const proposalFormSchema = z.object({
+  proposal: z.string().min(5),
+})

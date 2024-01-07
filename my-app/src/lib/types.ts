@@ -19,3 +19,19 @@ export type NavbarLink = {
   name: string;
   path: string;
 };
+
+// This will be the profile of crafter
+export type Crafter = {
+  id: string;
+  name: string;
+  bio: string;
+  domain: string;
+  location: string;
+  contact: number;
+  reviews: Review[];
+};
+
+export type Review = {
+  id: number;
+  review: string;
+}
