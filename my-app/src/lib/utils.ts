@@ -10,11 +10,11 @@ export function cn(...inputs: ClassValue[]) {
 export const navbarLinks: NavbarLink[] = [
   {
     name: "Post Jobs",
-    path: "",
+    path: "/jobs/create",
   },
   {
     name: "View Jobs",
-    path: "",
+    path: "/jobs",
   },
   {
     name: "Contact",
