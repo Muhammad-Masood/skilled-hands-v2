@@ -9,23 +9,29 @@ export type Job = {
 };
 
 export type Proposal = {
-    crafterId: string;
-    jobId: string;
-    proposal: string;
-    date: Date;
-}
+  crafterId: string;
+  jobId: string;
+  proposal: string;
+  date: Date;
+};
 
-// Crafter Profile
-export type Profile = {
-    id: string;
-    name: string;
-    bio: string;
-    domain: string;
-}
+export type NavbarLink = {
+  name: string;
+  path: string;
+};
 
-export interface ReviewDetails {
-  rating: number;
-  //Crafter Reviwes Details
+// This will be the profile of crafter
+export type Crafter = {
+  id: string;
+  name: string;
+  bio: string;
+  domain: string;
+  location: string;
+  contact: string;
+  reviews: Review[];
+};
+
+export type Review = {
   id: number;
-  review: number;
+  review: string;
 }

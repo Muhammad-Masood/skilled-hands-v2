@@ -1,19 +1,22 @@
-import { ClerkProvider } from "@clerk/nextjs";
-import { NavBar } from "../components/crafter/Navbar";
+import { NavBar } from "../components/Navbar";
 import "../globals.css";
+import { ClerkProvider } from "@clerk/nextjs";
+import { Toaster } from 'react-hot-toast';
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <ClerkProvider>
+    <ClerkProvider>
+      <html lang="en">
         <body className="bg-gradient-to-l from-cyan-500 to-sky-100 h-full">
+          <Toaster position="top-center"/>
           <NavBar />
           {children}
         </body>
-      </ClerkProvider>
-    </html>
+      </html>
+    </ClerkProvider>
   );
 }

@@ -15,17 +15,16 @@ import { NextRequest, NextResponse } from "next/server";
 
 // View All Proposals
 export async function GET() {
-    try {
-      const proposalsSnapshot = await getDocs(collection(db, "proposals"));
-      if (!proposalsSnapshot.empty) {
-        const proposalsData = proposalsSnapshot.docs.map((doc) => doc.data());
-        return NextResponse.json(proposalsData);
-      } else {
-        return NextResponse.json({ message: "No Proposal Found" });
-      }
-    } catch (error) {
-      console.log(error);
-      return NextResponse.json({ error: JSON.stringify(error) });
+  try {
+    const proposalsSnapshot = await getDocs(collection(db, "proposals"));
+    if (!proposalsSnapshot.empty) {
+      const proposalsData = proposalsSnapshot.docs.map((doc) => doc.data());
+      return NextResponse.json(proposalsData);
+    } else {
+      return NextResponse.json({ message: "No Proposal Found" });
     }
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json({ error: JSON.stringify(error) });
   }
-  
+}
