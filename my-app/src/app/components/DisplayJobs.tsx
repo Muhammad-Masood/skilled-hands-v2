@@ -29,7 +29,7 @@ const DisplayJobs = () => {
   return (
     <div className="space-y-6">
       <p>Available Jobs</p>
-      <div className="grid grid-cols-3">
+      <div className="grid grid-cols-3 gap-y-6">
         {isLoading ? (
           <Skeleton className="w-[350px] h-[180px]" />
         ) : jobsData && jobsData.length > 0 ? (

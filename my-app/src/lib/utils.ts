@@ -7,7 +7,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const navbarLinks: NavbarLink[] = [
+export const crafterNavbarLinks: NavbarLink[] = [
+  {
+    name: "Profile",
+    path: "/crafter/profile",
+  },
+];
+
+export const userNavLinks: NavbarLink[] = [
   {
     name: "Post Jobs",
     path: "/jobs/create",

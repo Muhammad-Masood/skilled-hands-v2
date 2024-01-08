@@ -49,9 +49,11 @@ export function JobCard({
     if (response.data.userId === null) {
       // land user on crafter registration page
       console.log("Register as a crafter");
-      setIsDialogOpen(true);
+      router.push("/crafter/profile");
+      
     } else {
       // proceed with the apply process
+      setIsDialogOpen(true);
       console.log("You are crafter already!");
     }
   };

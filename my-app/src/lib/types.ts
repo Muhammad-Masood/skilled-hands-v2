@@ -27,7 +27,7 @@ export type Crafter = {
   bio: string;
   domain: string;
   location: string;
-  contact: number;
+  contact: string;
   reviews: Review[];
 };
 
