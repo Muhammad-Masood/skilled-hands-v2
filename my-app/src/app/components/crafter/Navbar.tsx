@@ -35,7 +35,7 @@ import {
       <div className="py-[2rem]">
       <div className="hidden lg:block">
         <div className="flex items-center justify-center space-x-20">
-          <Link href="/" className="">
+          <Link href="/crafter" className="">
             Skilled Hands
           </Link>
           <div className="flex space-x-4">
@@ -59,7 +59,7 @@ import {
             {!userId ? (
               <SignInButton mode="modal" />
             ) : (
-              <UserButton afterSignOutUrl="/" />
+              <UserButton afterSignOutUrl="/crafter/profile" />
             )}
           </div>
         </div>

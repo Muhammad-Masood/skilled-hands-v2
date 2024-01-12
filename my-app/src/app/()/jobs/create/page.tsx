@@ -5,7 +5,7 @@ export default function page() {
   const { userId } = auth();
   return userId ? (
     <div className="p-6">
-      <JobForm/>
+      <JobForm userId={userId}/>
     </div>
   ) : (
     <div className="flex items-center justify-center">

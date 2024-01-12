@@ -1,5 +1,5 @@
 "use client";
-import { Job } from "@/lib/types";
+import { Job, Proposal } from "@/lib/types";
 import {
   Card,
   CardContent,
@@ -31,28 +31,31 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import toast from "react-hot-toast";
+import { useAuth } from "@clerk/nextjs";
 
-export function JobCard({
-  jobData,
-  variant,
-}: {
-  jobData: Job;
+interface JobCardProps {
+  job: Job;
+  isCrafterVerified?: boolean;
+  isUserVerified?: boolean;
   variant: "small" | "large";
-}) {
+}
+
+export function JobCard({ props }: { props: JobCardProps }) {
+  const { job, variant, isCrafterVerified, isUserVerified } = props;
+  const { userId } = useAuth();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isViewProposalDialogOpen, setIsViewProposalDialogOpen] =
+    useState(false);
+  const [proposals, setProposals] = useState<Proposal[] | undefined>(undefined);
   // const [proposalSent, setProposalSent] = useState(false);
   const router = useRouter();
-  const { title, desc, location, pay } = jobData;
+  const { title, desc, location, pay } = job;
 
   const handleJobApply = async () => {
-    const response = await axios.get(`/api/crafter/verify`);
-    if (response.data.userId === null) {
-      // land user on crafter registration page
-      console.log("Register as a crafter");
+    if (!isCrafterVerified) {
+      toast.error("You are not a crafter yet!");
       router.push("/crafter/profile");
-      
     } else {
-      // proceed with the apply process
       setIsDialogOpen(true);
       console.log("You are crafter already!");
     }
@@ -63,9 +66,13 @@ export function JobCard({
   });
 
   const submitProposal = async (values: z.infer<typeof proposalFormSchema>) => {
-    console.log(values.proposal);
-    const response = await axios.post('/api/crafter/proposal', values.proposal);
-    if(response.status === 200) {
+    toast.loading("Sending proposal...");
+    const response = await axios.post("/api/crafter/proposal", {
+      jobId: job.id,
+      crafterId: userId,
+      proposal: values.proposal,
+    });
+    if (response.status === 200) {
       toast.success("Proposal sent successfully.");
       toast.dismiss();
     } else {
@@ -73,10 +80,20 @@ export function JobCard({
     }
   };
 
+  const fetchProposals = async () => {
+    // proposals on this job Id
+    setIsViewProposalDialogOpen(true);
+    const _proposals: Proposal[] = (
+      await axios.get(`/api/crafter/proposal/${job.id}`)
+    ).data;
+    setProposals(_proposals);
+    console.log(proposals);
+  };
+
   return (
     <div>
       {variant === "small" ? (
-        <Link href={`/job/${jobData.id}`}>
+        <Link href={`/job/${job.id}`}>
           <Card className="w-[350px] h-[180px] bg-opacity-50 bg-sky-100 hover:shadow-2xl duration-200">
             <CardHeader>
               <CardTitle className="text-nowrap overflow-hidden overflow-ellipsis">
@@ -105,8 +122,15 @@ export function JobCard({
             <p className="">{location}</p>
             <p>Pay: {pay}</p>
           </CardContent>
-          <CardFooter className="flex justify-between">
+          <CardFooter className="flex space-x-5">
             <Button onClick={handleJobApply}>Apply</Button>
+            <Button
+              onClick={() => {
+                fetchProposals();
+              }}
+            >
+              View Proposals
+            </Button>
           </CardFooter>
         </Card>
       )}
@@ -147,15 +171,38 @@ export function JobCard({
                 </div>
               </div>
               <DialogFooter>
-                <Button type="submit" onClick={()=>{
-                  setIsDialogOpen(false);
-                  toast.loading("Sending proposal...");
-                }
-                }>Send proposal</Button>
+                <Button
+                  type="submit"
+                  onClick={() => {
+                    setIsDialogOpen(false);
+                  }}
+                >
+                  Send proposal
+                </Button>
               </DialogFooter>
             </form>
           </Form>
         </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={isViewProposalDialogOpen}
+        onOpenChange={() => setIsViewProposalDialogOpen(false)}
+      >
+        <DialogTrigger asChild />
+        {proposals ? (
+          proposals.map((proposal: Proposal, index: number) => (
+            <DialogContent key={index}>
+              <DialogHeader>
+                <DialogTitle>CrafterId {proposal.crafterId}</DialogTitle>
+                <DialogDescription>
+                  {proposal.proposal}
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>date</DialogFooter>
+            </DialogContent>
+          ))
+        ) : null}
       </Dialog>
     </div>
   );

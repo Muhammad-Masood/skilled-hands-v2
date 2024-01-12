@@ -1,5 +1,6 @@
 export type Job = {
   id: string;
+  userId: string;
   title: string;
   desc: string;
   location: string;
