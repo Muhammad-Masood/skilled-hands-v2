@@ -31,6 +31,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import toast from "react-hot-toast";
+import { useAuth } from "@clerk/nextjs";
 
 export function JobCard({
   jobData,
@@ -39,6 +40,7 @@ export function JobCard({
   jobData: Job;
   variant: "small" | "large";
 }) {
+  const { userId } = useAuth();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   // const [proposalSent, setProposalSent] = useState(false);
   const router = useRouter();
@@ -48,7 +50,7 @@ export function JobCard({
     const response = await axios.get(`/api/crafter/verify`);
     if (response.data.userId === null) {
       // land user on crafter registration page
-      console.log("Register as a crafter");
+      toast.error("You are not a crafter yet!");
       router.push("/crafter/profile");
       
     } else {
@@ -64,7 +66,7 @@ export function JobCard({
 
   const submitProposal = async (values: z.infer<typeof proposalFormSchema>) => {
     console.log(values.proposal);
-    const response = await axios.post('/api/crafter/proposal', values.proposal);
+    const response = await axios.post('/api/crafter/proposal', {jobId: jobData.id,crafterId: userId, proposal: values.proposal});
     if(response.status === 200) {
       toast.success("Proposal sent successfully.");
       toast.dismiss();
@@ -72,6 +74,10 @@ export function JobCard({
       toast.error("Error sending proposal.");
     }
   };
+
+  const fetchProposals = async () => {
+
+  }
 
   return (
     <div>
@@ -107,6 +113,7 @@ export function JobCard({
           </CardContent>
           <CardFooter className="flex justify-between">
             <Button onClick={handleJobApply}>Apply</Button>
+            <Button onClick={fetchProposals}>View Proposals</Button>
           </CardFooter>
         </Card>
       )}

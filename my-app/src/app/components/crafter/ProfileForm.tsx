@@ -51,7 +51,7 @@ export function ProfileForm({initialProfileData, update}:{initialProfileData: Cr
   }
 
   return (
-    <div className="flex items-center justify-center h-screen">
+    <div className="px-20 py-4">
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <FormField

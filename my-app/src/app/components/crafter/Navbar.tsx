@@ -59,7 +59,7 @@ import {
             {!userId ? (
               <SignInButton mode="modal" />
             ) : (
-              <UserButton afterSignOutUrl="/" />
+              <UserButton afterSignOutUrl="/crafter/profile" />
             )}
           </div>
         </div>

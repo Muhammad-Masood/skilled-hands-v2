@@ -31,7 +31,7 @@ export async function GET(request:NextRequest){
         if(crafterProfileData){
             return NextResponse.json(crafterProfileData);
         } else {
-            return NextResponse.json({userId: null});
+            return NextResponse.json(null);
         }
     } else {
         return NextResponse.json({message: "id not found"});
