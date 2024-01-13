@@ -1,11 +1,8 @@
-"use client";
-
-import { Job } from "@/lib/types";
+import { Job, Proposal } from "@/lib/types";
 import React, { useEffect, useRef, useState } from "react";
 import { JobCard } from "./JobCard";
 
-const DisplayJobs = ({ jobsData }: { jobsData: Job[] }) => {
-
+const DisplayJobs = async ({ jobsData }: { jobsData: Job[] }) => {
   return (
     <div className="space-y-6">
       <p>Available Jobs</p>

@@ -23,7 +23,7 @@ export async function POST(request:NextRequest){
 
 // for single search profile
 export async function GET(request:NextRequest){
-    const id = request.nextUrl.searchParams.get("id")
+    const id = request.nextUrl.searchParams.get("id");
     if(id!==null){
         const crafterProfileRef = doc(db, "crafters",id);
         const crafterProfileData: Crafter = (await getDoc(crafterProfileRef)).data() as Crafter;

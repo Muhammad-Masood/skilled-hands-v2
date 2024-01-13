@@ -27,4 +27,8 @@ export const userNavLinks: NavbarLink[] = [
     name: "Contact",
     path: "/contact",
   },
+  {
+    name: "Orders",
+    path: "/orders",
+  },
 ];

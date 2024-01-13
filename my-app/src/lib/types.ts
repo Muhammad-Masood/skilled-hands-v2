@@ -33,6 +33,15 @@ export type Crafter = {
 };
 
 export type Review = {
-  id: number;
-  review: string;
+  id: string;
+  review: number;
+}
+
+export type Order = {
+  id: string;
+  crafterId: string;
+  userId: string;
+  jobId: string;
+  status: "pending" | "completed";
+  date: Date;
 }

@@ -1,5 +1,5 @@
 "use client";
-import { Job, Proposal } from "@/lib/types";
+import { Crafter, Job, Proposal, Review } from "@/lib/types";
 import {
   Card,
   CardContent,
@@ -11,7 +11,7 @@ import {
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ReactElement, useState } from "react";
+import { ReactElement, useCallback, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import * as z from "zod";
 import { proposalFormSchema } from "@/lib/schema";
@@ -47,9 +47,23 @@ export function JobCard({ props }: { props: JobCardProps }) {
   const [isViewProposalDialogOpen, setIsViewProposalDialogOpen] =
     useState(false);
   const [proposals, setProposals] = useState<Proposal[] | undefined>(undefined);
-  // const [proposalSent, setProposalSent] = useState(false);
+  const [crafterData, setCrafterData] = useState<Crafter | undefined>(
+    undefined
+  );
+  const [crafterAvgRating, setCrafterAvgRating] = useState<number>(0);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { title, desc, location, pay } = job;
+
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set(name, value);
+
+      return params.toString();
+    },
+    [searchParams]
+  );
 
   const handleJobApply = async () => {
     if (!isCrafterVerified) {
@@ -67,16 +81,23 @@ export function JobCard({ props }: { props: JobCardProps }) {
 
   const submitProposal = async (values: z.infer<typeof proposalFormSchema>) => {
     toast.loading("Sending proposal...");
-    const response = await axios.post("/api/crafter/proposal", {
-      jobId: job.id,
-      crafterId: userId,
-      proposal: values.proposal,
-    });
-    if (response.status === 200) {
-      toast.success("Proposal sent successfully.");
-      toast.dismiss();
+    const alreadySubmitted: boolean = (
+      await axios.get(`/api/crafter/proposals/${userId}`)
+    ).data;
+    if (!alreadySubmitted) {
+      const response = await axios.post("/api/crafter/proposal", {
+        jobId: job.id,
+        crafterId: userId,
+        proposal: values.proposal,
+      });
+      if (response.status === 200) {
+        toast.success("Proposal sent successfully.");
+        toast.dismiss();
+      } else {
+        toast.error("Error sending proposal.");
+      }
     } else {
-      toast.error("Error sending proposal.");
+      toast.error("You have already submitted the proposal.");
     }
   };
 
@@ -87,7 +108,47 @@ export function JobCard({ props }: { props: JobCardProps }) {
       await axios.get(`/api/crafter/proposal/${job.id}`)
     ).data;
     setProposals(_proposals);
-    console.log(proposals);
+  };
+
+  const hireCrafter = async () => {
+    try {
+      toast.loading("Placing order...");
+      const orderData = {
+        jobId: job.id,
+        userId: userId,
+        crafterId: crafterData!.id,
+        status: "pending",
+      };
+      const postOrderResponse = await axios.post(`/api/user/order`, orderData);
+      console.log(postOrderResponse);
+      toast.dismiss();
+      toast.success("Crafter hired successfully!");
+      router.replace(`/jobs`);
+    } catch (error) {
+      toast.dismiss();
+      console.log(error);
+      toast.error("Error placing order...");
+    }
+  };
+
+  const fetchAndSetCrafterData = async (crafterId: string) => {
+    try {
+      const _crafterData = (
+        await axios.get(`/api/crafter/profile?id=${crafterId}`)
+      ).data;
+      setCrafterData(_crafterData);
+      let avgRating = 0;
+      if (_crafterData && _crafterData.reviews) {
+        let revSum = 0;
+        crafterData!.reviews.map((rev: Review) => (revSum += rev.review));
+        avgRating = revSum / crafterData!.reviews.length;
+      }
+      console.log("crafter avg rating: ", avgRating);
+      setCrafterAvgRating(avgRating);
+    } catch (error) {
+      toast.error("Error fetching crafter data");
+      console.log(error);
+    }
   };
 
   return (
@@ -190,19 +251,55 @@ export function JobCard({ props }: { props: JobCardProps }) {
         onOpenChange={() => setIsViewProposalDialogOpen(false)}
       >
         <DialogTrigger asChild />
-        {proposals ? (
-          proposals.map((proposal: Proposal, index: number) => (
-            <DialogContent key={index}>
-              <DialogHeader>
-                <DialogTitle>CrafterId {proposal.crafterId}</DialogTitle>
-                <DialogDescription>
-                  {proposal.proposal}
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>date</DialogFooter>
-            </DialogContent>
-          ))
-        ) : null}
+        {proposals
+          ? proposals.map((proposal: Proposal, index: number) => (
+              <DialogContent key={index}>
+                <DialogHeader
+                  onClick={() => {
+                    router.push(
+                      "?" + createQueryString("hire", proposal.crafterId)
+                    );
+                    fetchAndSetCrafterData(proposal.crafterId);
+                  }}
+                  className="cursor-pointer hover:text-gray-700"
+                >
+                  <DialogTitle>CrafterId {proposal.crafterId}</DialogTitle>
+                  <DialogDescription>{proposal.proposal}</DialogDescription>
+                </DialogHeader>
+                <DialogFooter>date</DialogFooter>
+              </DialogContent>
+            ))
+          : null}
+      </Dialog>
+
+      <Dialog
+        open={searchParams.has("hire") && searchParams.get("hire") !== ""}
+        onOpenChange={() => router.push("?" + createQueryString("hire", ""))}
+      >
+        <DialogTrigger asChild />
+        {crafterData && (
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{crafterData.name}</DialogTitle>
+              <DialogDescription className="space-y-2 pt-3">
+                <div>{crafterData.domain}</div>
+                <div>{crafterData.location}</div>
+                <div>
+                  Rating{" "}
+                  {crafterAvgRating === 0 ? "No Rating" : crafterAvgRating}
+                </div>
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                onClick={() => router.replace(`/crafter/${crafterData.id}`)}
+              >
+                View Profile
+              </Button>
+              <Button onClick={hireCrafter}>Hire</Button>
+            </DialogFooter>
+          </DialogContent>
+        )}
       </Dialog>
     </div>
   );
