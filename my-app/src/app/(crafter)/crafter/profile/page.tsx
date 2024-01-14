@@ -1,15 +1,12 @@
-"use client";
-import ProfileData from "@/app/components/crafter/ProfileData";
-import { ProfileForm } from "@/app/components/crafter/ProfileForm";
-import { Button } from "@/components/ui/button";
-import { Crafter } from "@/lib/types";
-import { SignIn, useAuth } from "@clerk/nextjs";
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import ProfileData from '@/app/components/crafter/ProfileData'
+import { ProfileForm } from '@/app/components/crafter/ProfileForm'
+import { Button } from '@/components/ui/button'
+import { Crafter } from '@/lib/types'
+import { SignIn, auth } from '@clerk/nextjs'
+import axios from 'axios'
 
-const page = () => {
-  const [profileData, setProfileData] = useState(null);
-  const { userId } = useAuth();
+const page = async () => {
+  const { userId } = auth();
   const emptyDefaultValues: Crafter = {
     id: "",
     name: "",
@@ -20,29 +17,27 @@ const page = () => {
     reviews: [],
   };
 
-  useEffect(() => {
-    async function fetchProfile() {
-      const response = await axios.get(`/api/crafter/profile?id=${userId}`);
-      setProfileData(response.data);
-    }
-    fetchProfile();
-  }, []);
-  console.log(userId, profileData);
+  const profileData:Crafter | null = userId ? (await axios.get(`${process.env.PORT_URL}/api/crafter/profile?id=${userId}`)).data:null;
+  console.log(profileData);
+
   return (
     <div>
-      {userId ? (
-        profileData == null ? (
-          <div>
-            <h1 className="text-center">Create Profile </h1>
-            <ProfileForm
-              initialProfileData={emptyDefaultValues}
-              update={false}
-            />
-          </div>
+      {
+        userId ? (
+          profileData==null ? (
+            <div>
+              <h1 className="text-center">Create Profile </h1>
+              <ProfileForm initialProfileData={emptyDefaultValues} update={false} />
+            </div>
+          ) : (
+            <div>
+              <p className="text-center">Your Profile</p>
+              <ProfileData />
+            </div>
+          )
         ) : (
-          <div>
-            <p className="text-center">Your Profile</p>
-            <ProfileData />
+          <div className='flex items-center justify-center'>
+            <SignIn afterSignInUrl={"/crafter/profile"} afterSignUpUrl={"/crafter"} />
           </div>
         )
       ) : (

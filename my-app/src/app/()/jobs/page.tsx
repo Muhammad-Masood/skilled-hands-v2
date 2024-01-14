@@ -6,10 +6,12 @@ import axios from "axios";
 
 export default async function page() {
   const { userId } = auth();
+  
+  const jobs: Job[] = userId?(await axios.get(`${process.env.PORT_URL}/api/user/jobs`)).data:[];
 
   return userId ? (
-    <div className="pt-5 px-20">
-      <DisplayJobs />
+    <div className="pt-5 px-20 ">
+      <DisplayJobs jobsData={jobs} />
     </div>
   ) : (
     <div className="flex items-center justify-center">

@@ -35,7 +35,7 @@ import {
       <div className="py-[2rem]">
       <div className="hidden lg:block">
         <div className="flex items-center justify-center space-x-20">
-          <Link href="/" className="">
+          <Link href="/crafter" className="">
             Skilled Hands
           </Link>
           <div className="flex space-x-4">
@@ -43,7 +43,7 @@ import {
               <NavigationMenu key={index} orientation="horizontal">
                 <NavigationMenuList>
                   <NavigationMenuItem>
-                    <Link href={link.path} legacyBehavior passHref>
+                    <Link href={link.name === "You"?link.path+`/${userId}` : link.path} legacyBehavior passHref>
                       <NavigationMenuLink
                         className={navigationMenuTriggerStyle()}
                       >

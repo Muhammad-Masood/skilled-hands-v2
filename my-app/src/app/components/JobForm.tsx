@@ -18,23 +18,26 @@ import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-// import { clerkClient, useAuth } from "@clerk/nextjs";
 
-export function JobForm() {
-  // const {userId} = useAuth();
-  // const user = clerkClient.users.getUser(userId!);
+export function JobForm({userId}:{userId: string}) {
   const router = useRouter();
   const form = useForm<z.infer<typeof jobFormSchema>>({
     resolver: zodResolver(jobFormSchema),
+    defaultValues:{
+      userId: userId
+    }
   });
 
   async function onSubmit(values: z.infer<typeof jobFormSchema>) {
+    toast.loading("Posting Job...");
     console.log(values);
     const response = await axios.post("/api/user/job", values);
     if (response.status === 200) {
+      toast.dismiss();
       toast.success("Job posted successfully.");
       router.refresh();
     } else {
+      toast.dismiss();
       toast.error("Error posting job.");
     }
   }
@@ -124,10 +127,13 @@ export function JobForm() {
                 <FormLabel>Contact</FormLabel>
                 <FormControl>
                   <Input
-                    type="numbers"
+                    type="number"
                     placeholder="03123456789"
                     {...field}
                     className="bg-inherit border-sky-600"
+                    // onChange={(e) => {
+                    //   field.onChange(parseInt(e.target.value, 10));
+                    // }}
                   />
                 </FormControl>
                 <FormDescription>

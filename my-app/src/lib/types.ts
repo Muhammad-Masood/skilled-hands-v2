@@ -1,5 +1,6 @@
 export type Job = {
   id: string;
+  userId: string;
   title: string;
   desc: string;
   location: string;
@@ -28,10 +29,14 @@ export type Crafter = {
   domain: string;
   location: string;
   contact: string;
-  reviews: Review[];
+  reviews: number[];
 };
 
-export type Review = {
-  id: number;
-  review: string;
+export type Order = {
+  id: string;
+  crafterId: string;
+  userId: string;
+  jobId: string;
+  status: "pending" | "completed";
+  date: Date;
 }

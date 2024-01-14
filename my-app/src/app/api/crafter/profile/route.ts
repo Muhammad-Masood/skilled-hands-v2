@@ -7,7 +7,6 @@
 import { db } from "@/firebase";
 import { Crafter } from "@/lib/types";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { INTERNALS } from "next/dist/server/web/spec-extension/request";
 import { NextRequest, NextResponse } from "next/server";
 
 const obj = {
@@ -17,14 +16,14 @@ const obj = {
 export async function POST(request:NextRequest){
     const data:Crafter = await request.json();
     console.log(data);
-    const dataDocumentReference = doc(db,"profile",data.id)
+    const dataDocumentReference = doc(db,"crafters",data.id)
     await setDoc(dataDocumentReference,data, {merge:true});
     return NextResponse.json(obj);
 }
 
 // for single search profile
 export async function GET(request:NextRequest){
-    const id = request.nextUrl.searchParams.get("id")
+    const id = request.nextUrl.searchParams.get("id");
     if(id!==null){
         const crafterProfileRef = doc(db, "crafters",id);
         const crafterProfileData: Crafter = (await getDoc(crafterProfileRef)).data() as Crafter;

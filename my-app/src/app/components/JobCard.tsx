@@ -1,5 +1,5 @@
 "use client";
-import { Job } from "@/lib/types";
+import { Crafter, Job, Proposal } from "@/lib/types";
 import {
   Card,
   CardContent,
@@ -11,7 +11,7 @@ import {
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ReactElement, useState } from "react";
+import { ReactElement, useCallback, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import * as z from "zod";
 import { proposalFormSchema } from "@/lib/schema";
@@ -32,29 +32,45 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import toast from "react-hot-toast";
 import { useAuth } from "@clerk/nextjs";
+import { Star } from "lucide-react";
 
-export function JobCard({
-  jobData,
-  variant,
-}: {
-  jobData: Job;
+interface JobCardProps {
+  job: Job;
+  isCrafterVerified?: boolean;
+  isUserVerified?: boolean;
   variant: "small" | "large";
-}) {
+}
+
+export function JobCard({ props }: { props: JobCardProps }) {
+  const { job, variant, isCrafterVerified, isUserVerified } = props;
   const { userId } = useAuth();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  // const [proposalSent, setProposalSent] = useState(false);
+  const [isViewProposalDialogOpen, setIsViewProposalDialogOpen] =
+    useState(false);
+  const [proposals, setProposals] = useState<Proposal[] | undefined>(undefined);
+  const [crafterData, setCrafterData] = useState<Crafter | undefined>(
+    undefined
+  );
+  const [crafterAvgRating, setCrafterAvgRating] = useState<number>(0);
   const router = useRouter();
-  const { title, desc, location, pay } = jobData;
+  const searchParams = useSearchParams();
+  const { title, desc, location, pay } = job;
+
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set(name, value);
+
+      return params.toString();
+    },
+    [searchParams]
+  );
 
   const handleJobApply = async () => {
-    const response = await axios.get(`/api/crafter/verify`);
-    if (response.data.userId === null) {
-      // land user on crafter registration page
+    if (!isCrafterVerified) {
       toast.error("You are not a crafter yet!");
       router.push("/crafter/profile");
-      
     } else {
-      // proceed with the apply process
       setIsDialogOpen(true);
       console.log("You are crafter already!");
     }
@@ -65,24 +81,92 @@ export function JobCard({
   });
 
   const submitProposal = async (values: z.infer<typeof proposalFormSchema>) => {
-    console.log(values.proposal);
-    const response = await axios.post('/api/crafter/proposal', {jobId: jobData.id,crafterId: userId, proposal: values.proposal});
-    if(response.status === 200) {
-      toast.success("Proposal sent successfully.");
-      toast.dismiss();
+    toast.loading("Sending proposal...");
+    const alreadySubmitted: boolean = (
+      await axios.get(`/api/crafter/proposal/crafter/${userId}`)
+    ).data;
+    if (!alreadySubmitted) {
+      const response = await axios.post("/api/crafter/proposal", {
+        jobId: job.id,
+        crafterId: userId,
+        proposal: values.proposal,
+      });
+      if (response.status === 200) {
+        toast.success("Proposal sent successfully.");
+        toast.dismiss();
+      } else {
+        toast.error("Error sending proposal.");
+        toast.dismiss();
+      }
     } else {
-      toast.error("Error sending proposal.");
+      toast.error("You have already submitted the proposal.");
+      toast.dismiss()
     }
   };
 
   const fetchProposals = async () => {
+    try {
+      // proposals on this job Id
+      setIsViewProposalDialogOpen(true);
+      const _proposals: Proposal[] = (
+        await axios.get(`/api/crafter/proposal/${job.id}`)
+      ).data;
+      setProposals(_proposals);
+      toast.dismiss();
+    } catch (error) {
+      toast.dismiss();
+      toast.error("Error fetching proposals.");
+      console.log(error);
+    }
+  };
 
-  }
+  const hireCrafter = async () => {
+    try {
+      toast.loading("Placing order...");
+      const orderData = {
+        jobId: job.id,
+        userId: userId,
+        crafterId: crafterData!.id,
+        status: "pending",
+      };
+      const postOrderResponse = await axios.post(`/api/user/order`, orderData);
+      console.log(postOrderResponse);
+      toast.dismiss();
+      toast.success("Crafter hired successfully!");
+      router.replace(`/jobs`);
+    } catch (error) {
+      toast.dismiss();
+      console.log(error);
+      toast.error("Error placing order...");
+    }
+  };
+
+  const fetchAndSetCrafterData = async (crafterId: string) => {
+    try {
+      const _crafterData:Crafter | null = (
+        await axios.get(`/api/crafter/profile?id=${crafterId}`)
+      ).data;
+      console.log(_crafterData);
+      setCrafterData(_crafterData!);
+
+      let avgRating = 0;
+      if (_crafterData && _crafterData.reviews) {
+        let revSum = 0;
+        _crafterData.reviews.map((rev: number) => (revSum += rev));
+        avgRating = revSum / _crafterData.reviews.length;
+      }
+      console.log("crafter avg rating: ", avgRating);
+      setCrafterAvgRating(Number(avgRating.toFixed(2)));
+    } catch (error) {
+      toast.error("Error fetching crafter data");
+      console.log(error);
+    }
+  };
 
   return (
-    <div>
+    <div className="flex flex-wrap justify-center space-y-5">
       {variant === "small" ? (
-        <Link href={`/job/${jobData.id}`}>
+        <Link href={`/job/${job.id}`}>
           <Card className="w-[350px] h-[180px] bg-opacity-50 bg-sky-100 hover:shadow-2xl duration-200">
             <CardHeader>
               <CardTitle className="text-nowrap overflow-hidden overflow-ellipsis">
@@ -111,9 +195,16 @@ export function JobCard({
             <p className="">{location}</p>
             <p>Pay: {pay}</p>
           </CardContent>
-          <CardFooter className="flex justify-between">
+          <CardFooter className="flex space-x-5">
             <Button onClick={handleJobApply}>Apply</Button>
-            <Button onClick={fetchProposals}>View Proposals</Button>
+            <Button
+              onClick={() => {
+                toast.loading("Getting proposals...");
+                fetchProposals();
+              }}
+            >
+              View Proposals
+            </Button>
           </CardFooter>
         </Card>
       )}
@@ -154,15 +245,78 @@ export function JobCard({
                 </div>
               </div>
               <DialogFooter>
-                <Button type="submit" onClick={()=>{
-                  setIsDialogOpen(false);
-                  toast.loading("Sending proposal...");
-                }
-                }>Send proposal</Button>
+                <Button
+                  type="submit"
+                  onClick={() => {
+                    setIsDialogOpen(false);
+                  }}
+                >
+                  Send proposal
+                </Button>
               </DialogFooter>
             </form>
           </Form>
         </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={isViewProposalDialogOpen}
+        onOpenChange={() => setIsViewProposalDialogOpen(false)}
+      >
+        <DialogTrigger asChild />
+        <div className="space-y-3">
+        {proposals
+          ? proposals.map((proposal: Proposal, index: number) => (
+              <DialogContent key={index}>
+                <DialogHeader
+                  onClick={() => {
+                    router.push(
+                      "?" + createQueryString("hire", proposal.crafterId)
+                    );
+                    fetchAndSetCrafterData(proposal.crafterId);
+                  }}
+                  className="cursor-pointer hover:text-gray-700"
+                >
+                  <DialogTitle>CrafterId {proposal.crafterId}</DialogTitle>
+                  <DialogDescription>{proposal.proposal}</DialogDescription>
+                </DialogHeader>
+              </DialogContent>
+            ))
+          : null}
+          </div>
+      </Dialog>
+
+      <Dialog
+        open={searchParams.has("hire") && searchParams.get("hire") !== ""}
+        onOpenChange={() => router.push("?" + createQueryString("hire", ""))}
+      >
+        <DialogTrigger asChild />
+        {crafterData && (
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{crafterData.name}</DialogTitle>
+              <DialogDescription className="space-y-2 pt-3">
+                <div>{crafterData.domain}</div>
+                <div>{crafterData.location}</div>
+                <div className="flex gap-x-2">
+                  Rating{" "}
+                  {crafterAvgRating === 0 ? "No Rating" : crafterAvgRating}
+                  <Star className="w-5 h-5" />
+                </div>
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                onClick={() =>
+                  router.replace(`/crafter/profile/${crafterData.id}`)
+                }
+              >
+                View Profile
+              </Button>
+              <Button onClick={hireCrafter}>Hire</Button>
+            </DialogFooter>
+          </DialogContent>
+        )}
       </Dialog>
     </div>
   );
