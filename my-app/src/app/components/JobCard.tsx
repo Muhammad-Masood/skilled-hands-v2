@@ -102,12 +102,20 @@ export function JobCard({ props }: { props: JobCardProps }) {
   };
 
   const fetchProposals = async () => {
-    // proposals on this job Id
+    try{
+      // proposals on this job Id
     setIsViewProposalDialogOpen(true);
     const _proposals: Proposal[] = (
       await axios.get(`/api/crafter/proposal/${job.id}`)
     ).data;
     setProposals(_proposals);
+    toast.dismiss();
+    } catch(error){
+      toast.dismiss();
+      toast.error("E");
+      console.log(error);
+    }
+    
   };
 
   const hireCrafter = async () => {
@@ -187,6 +195,7 @@ export function JobCard({ props }: { props: JobCardProps }) {
             <Button onClick={handleJobApply}>Apply</Button>
             <Button
               onClick={() => {
+                toast.loading("Getting proposals...");
                 fetchProposals();
               }}
             >
@@ -292,7 +301,7 @@ export function JobCard({ props }: { props: JobCardProps }) {
             </DialogHeader>
             <DialogFooter>
               <Button
-                onClick={() => router.replace(`/crafter/${crafterData.id}`)}
+                onClick={() => router.replace(`/crafter/profile/${crafterData.id}`)}
               >
                 View Profile
               </Button>

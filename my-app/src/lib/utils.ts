@@ -12,6 +12,10 @@ export const crafterNavbarLinks: NavbarLink[] = [
     name: "Profile",
     path: "/crafter/profile",
   },
+  {
+    name: "You",
+    path: "/crafter/profile",
+  }
 ];
 
 export const userNavLinks: NavbarLink[] = [

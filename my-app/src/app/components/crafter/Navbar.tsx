@@ -43,7 +43,7 @@ import {
               <NavigationMenu key={index} orientation="horizontal">
                 <NavigationMenuList>
                   <NavigationMenuItem>
-                    <Link href={link.path} legacyBehavior passHref>
+                    <Link href={link.name === "You"?link.path+`/${userId}` : link.path} legacyBehavior passHref>
                       <NavigationMenuLink
                         className={navigationMenuTriggerStyle()}
                       >
