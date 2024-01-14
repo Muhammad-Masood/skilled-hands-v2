@@ -20,12 +20,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export function OrderCard({ order }: { order: Order }) {
   const { crafterId, date, id, jobId, status, userId } = order;
 
   const [isReviewBoxOpen, setIsReviewBoxOpen] = useState(false);
   const [isFinishBoxOpen, setIsFinishBoxOpen] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const cancelOrder = async () => {
     try {
@@ -44,7 +48,7 @@ export function OrderCard({ order }: { order: Order }) {
       const loadToastId = toast.loading("Marking order as completed...");
       await axios.patch(`/api/user/order?id=${id}`);
       toast.dismiss(loadToastId);
-      toast.success("Order cancelled successfully");
+      toast.success("Order finished successfully");
     } catch (error) {
       toast.dismiss();
       toast.error("Error");
@@ -55,9 +59,14 @@ export function OrderCard({ order }: { order: Order }) {
   const submitReview = async () => {
     try {
       toast.loading("Posting your review...");
-      await axios.patch(`/api/crafter/review`);
+      await axios.patch(
+        `/api/user/review?id=${crafterId}&review=${searchParams.get(
+          `rating`
+        )}`
+      );
       toast.success("Thanks for the feedback...");
       setIsFinishBoxOpen(true);
+      toast.dismiss();
     } catch (error) {
       toast.dismiss();
       toast.error("Error posting review!");
@@ -115,7 +124,11 @@ export function OrderCard({ order }: { order: Order }) {
         <DialogContent className="w-52 ">
           <DialogHeader className="space-y-4">
             <DialogTitle>Rate Crafter</DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="space-y-4">
+              <Input
+                type="number"
+                onChange={(e: any) => router.push(`?rating=${e.target.value}`)}
+              />
               <Button onClick={submitReview}>Rate</Button>
             </DialogDescription>
           </DialogHeader>

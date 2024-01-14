@@ -1,31 +1,46 @@
-"use client"
+"use client";
+import { Crafter } from "@/lib/types";
 import axios from "axios";
 import { BookmarkCheck, Search } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export function Hero() {
   const [search, setSearch] = useState("");
+  const [searchResults, setSearchResults] = useState<Crafter[]>([]);
+
   const handleSearch = async () => {
     console.log(search);
-    try{
+    try {
       toast.loading("Getting crafters based on domain...");
-      const response = await axios.get(`/api/crafter/domain?domain=${search}`);
-      console.log(response);
+      const response: Crafter[] = (
+        await axios.get(`/api/crafter/domain?domain=${search}`)
+      ).data;
+      setSearchResults(response);
       toast.dismiss();
-    } catch (error){
+      toast.success("Scroll down for the results.");
+    } catch (error) {
       toast.error("Error searching domain.");
       console.log(error);
     }
-  }
+  };
 
   return (
     <>
       <div className="flex flex-wrap pt-2">
         <div className="lg:w-3/6 w-full sm:p-2 h-full flex items-center justify-center px-4 md:items-start md:justify-start md:p-20 flex-col ">
           <h1 className="md:text-6xl text-2xl sm:text-2xl font-extrabold mb-4 text-black">
-            Empovering <span className="text-indigo-600"> Skills </span> Transforming <span className="text-indigo-600"> Lives.</span>{" "}
+            Empovering <span className="text-indigo-600"> Skills </span>{" "}
+            Transforming <span className="text-indigo-600"> Lives.</span>{" "}
           </h1>
           <p className="md:text-lg sm:text-sm text-xs mb-10 text-gray-400">
             Hire the most experienced workers in your area!
@@ -58,12 +73,24 @@ export function Hero() {
           </div>
         </div>
         <div className="hidden lg:flex">
-          <Image
-            width={600}
-            height={700}
-            src="/worker.png"
-            alt="hero-img"
-          />
+          <Image width={600} height={700} src="/worker.png" alt="hero-img" />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {searchResults && (
+          searchResults.map((crafter:Crafter, index:number) => (
+            <Card className="m-4 md:m-2 lg:m-20 opacity-80" key={index}>
+            <CardHeader>
+              <CardTitle>{crafter.name}</CardTitle>
+              <CardDescription className="space-y-2">
+                <p>{crafter.domain}</p>
+                <p>{crafter.location}</p>
+                <p>{crafter.contact}</p>
+                </CardDescription>
+            </CardHeader>
+          </Card>
+          ))
+        )}
         </div>
       </div>
     </>

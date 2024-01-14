@@ -83,7 +83,7 @@ export function JobCard({ props }: { props: JobCardProps }) {
   const submitProposal = async (values: z.infer<typeof proposalFormSchema>) => {
     toast.loading("Sending proposal...");
     const alreadySubmitted: boolean = (
-      await axios.get(`/api/crafter/proposals/${userId}`)
+      await axios.get(`/api/crafter/proposal/crafter/${userId}`)
     ).data;
     if (!alreadySubmitted) {
       const response = await axios.post("/api/crafter/proposal", {
@@ -96,27 +96,28 @@ export function JobCard({ props }: { props: JobCardProps }) {
         toast.dismiss();
       } else {
         toast.error("Error sending proposal.");
+        toast.dismiss();
       }
     } else {
       toast.error("You have already submitted the proposal.");
+      toast.dismiss()
     }
   };
 
   const fetchProposals = async () => {
-    try{
+    try {
       // proposals on this job Id
-    setIsViewProposalDialogOpen(true);
-    const _proposals: Proposal[] = (
-      await axios.get(`/api/crafter/proposal/${job.id}`)
-    ).data;
-    setProposals(_proposals);
-    toast.dismiss();
-    } catch(error){
+      setIsViewProposalDialogOpen(true);
+      const _proposals: Proposal[] = (
+        await axios.get(`/api/crafter/proposal/${job.id}`)
+      ).data;
+      setProposals(_proposals);
       toast.dismiss();
-      toast.error("E");
+    } catch (error) {
+      toast.dismiss();
+      toast.error("Error fetching proposals.");
       console.log(error);
     }
-    
   };
 
   const hireCrafter = async () => {
@@ -142,20 +143,20 @@ export function JobCard({ props }: { props: JobCardProps }) {
 
   const fetchAndSetCrafterData = async (crafterId: string) => {
     try {
-      const _crafterData = (
+      const _crafterData:Crafter | null = (
         await axios.get(`/api/crafter/profile?id=${crafterId}`)
       ).data;
       console.log(_crafterData);
-      setCrafterData(_crafterData);
+      setCrafterData(_crafterData!);
 
       let avgRating = 0;
       if (_crafterData && _crafterData.reviews) {
         let revSum = 0;
-        crafterData!.reviews.map((rev: number) => (revSum += rev));
-        avgRating = revSum / crafterData!.reviews.length;
+        _crafterData.reviews.map((rev: number) => (revSum += rev));
+        avgRating = revSum / _crafterData.reviews.length;
       }
       console.log("crafter avg rating: ", avgRating);
-      setCrafterAvgRating(avgRating);
+      setCrafterAvgRating(Number(avgRating.toFixed(2)));
     } catch (error) {
       toast.error("Error fetching crafter data");
       console.log(error);
@@ -263,6 +264,7 @@ export function JobCard({ props }: { props: JobCardProps }) {
         onOpenChange={() => setIsViewProposalDialogOpen(false)}
       >
         <DialogTrigger asChild />
+        <div className="space-y-3">
         {proposals
           ? proposals.map((proposal: Proposal, index: number) => (
               <DialogContent key={index}>
@@ -278,10 +280,10 @@ export function JobCard({ props }: { props: JobCardProps }) {
                   <DialogTitle>CrafterId {proposal.crafterId}</DialogTitle>
                   <DialogDescription>{proposal.proposal}</DialogDescription>
                 </DialogHeader>
-                <DialogFooter>date</DialogFooter>
               </DialogContent>
             ))
           : null}
+          </div>
       </Dialog>
 
       <Dialog
@@ -305,7 +307,9 @@ export function JobCard({ props }: { props: JobCardProps }) {
             </DialogHeader>
             <DialogFooter>
               <Button
-                onClick={() => router.replace(`/crafter/profile/${crafterData.id}`)}
+                onClick={() =>
+                  router.replace(`/crafter/profile/${crafterData.id}`)
+                }
               >
                 View Profile
               </Button>
