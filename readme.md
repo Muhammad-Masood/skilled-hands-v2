@@ -26,4 +26,4 @@ Clients select the top crafters based on profiles, badges, and work experience.
 
 Clients and crafters negotiate and agree upon a milestone, which can be placed as an order on the platform.
 
-![Alt text](image.png)
+![Alt text](BPMN.png)
