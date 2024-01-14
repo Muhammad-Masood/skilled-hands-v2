@@ -42,7 +42,7 @@ Clients select the top crafters based on profiles, badges, and work experience.
 ### Negotiation and Agreement on Milestone
 Clients and crafters negotiate and agree upon a milestone, which can be placed as an order on the platform.
 
-![BPMN Diagram](image.png)
+![Alt text](BPMN.png)
 
 ## Use Case #3: Job Feedback
 
