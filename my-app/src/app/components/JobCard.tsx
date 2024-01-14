@@ -1,5 +1,5 @@
 "use client";
-import { Crafter, Job, Proposal, Review } from "@/lib/types";
+import { Crafter, Job, Proposal } from "@/lib/types";
 import {
   Card,
   CardContent,
@@ -32,6 +32,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import toast from "react-hot-toast";
 import { useAuth } from "@clerk/nextjs";
+import { Star } from "lucide-react";
 
 interface JobCardProps {
   job: Job;
@@ -144,11 +145,13 @@ export function JobCard({ props }: { props: JobCardProps }) {
       const _crafterData = (
         await axios.get(`/api/crafter/profile?id=${crafterId}`)
       ).data;
+      console.log(_crafterData);
       setCrafterData(_crafterData);
+
       let avgRating = 0;
       if (_crafterData && _crafterData.reviews) {
         let revSum = 0;
-        crafterData!.reviews.map((rev: Review) => (revSum += rev.review));
+        crafterData!.reviews.map((rev: number) => (revSum += rev));
         avgRating = revSum / crafterData!.reviews.length;
       }
       console.log("crafter avg rating: ", avgRating);
@@ -160,7 +163,7 @@ export function JobCard({ props }: { props: JobCardProps }) {
   };
 
   return (
-    <div>
+    <div className="flex flex-wrap justify-center space-y-5">
       {variant === "small" ? (
         <Link href={`/job/${job.id}`}>
           <Card className="w-[350px] h-[180px] bg-opacity-50 bg-sky-100 hover:shadow-2xl duration-200">
@@ -293,9 +296,10 @@ export function JobCard({ props }: { props: JobCardProps }) {
               <DialogDescription className="space-y-2 pt-3">
                 <div>{crafterData.domain}</div>
                 <div>{crafterData.location}</div>
-                <div>
+                <div className="flex gap-x-2">
                   Rating{" "}
                   {crafterAvgRating === 0 ? "No Rating" : crafterAvgRating}
+                  <Star className="w-5 h-5" />
                 </div>
               </DialogDescription>
             </DialogHeader>

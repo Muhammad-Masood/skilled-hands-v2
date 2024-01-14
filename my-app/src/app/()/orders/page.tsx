@@ -6,7 +6,7 @@ import axios from "axios";
 export default async function page() {
   const { userId } = auth();
   
-  const orders: Order[] = userId?(await axios.get(`${process.env.PORT_URL}/api/user/orders`)).data:[];
+  const orders: Order[] = userId?(await axios.get(`${process.env.PORT_URL}/api/user/orders/${userId}`)).data:[];
 
   return userId ? (
     <div className="pt-5 px-20">

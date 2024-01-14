@@ -29,13 +29,8 @@ export type Crafter = {
   domain: string;
   location: string;
   contact: string;
-  reviews: Review[];
+  reviews: number[];
 };
-
-export type Review = {
-  id: string;
-  review: number;
-}
 
 export type Order = {
   id: string;

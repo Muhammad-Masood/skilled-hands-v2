@@ -10,7 +10,7 @@ export default async function page() {
   const jobs: Job[] = userId?(await axios.get(`${process.env.PORT_URL}/api/user/jobs`)).data:[];
 
   return userId ? (
-    <div className="pt-5 px-20">
+    <div className="pt-5 px-20 ">
       <DisplayJobs jobsData={jobs} />
     </div>
   ) : (

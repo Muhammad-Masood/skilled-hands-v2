@@ -11,9 +11,21 @@ import {
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 import axios from "axios";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useState } from "react";
 
 export function OrderCard({ order }: { order: Order }) {
   const { crafterId, date, id, jobId, status, userId } = order;
+
+  const [isReviewBoxOpen, setIsReviewBoxOpen] = useState(false);
+  const [isFinishBoxOpen, setIsFinishBoxOpen] = useState(false);
 
   const cancelOrder = async () => {
     try {
@@ -40,8 +52,21 @@ export function OrderCard({ order }: { order: Order }) {
     }
   };
 
+  const submitReview = async () => {
+    try {
+      toast.loading("Posting your review...");
+      await axios.patch(`/api/crafter/review`);
+      toast.success("Thanks for the feedback...");
+      setIsFinishBoxOpen(true);
+    } catch (error) {
+      toast.dismiss();
+      toast.error("Error posting review!");
+      console.log(error);
+    }
+  };
+
   return (
-    <div>
+    <div className="flex flex-wrap justify-center space-y-5">
       <Card>
         <CardHeader>
           <CardTitle className="space-y-3">
@@ -73,12 +98,43 @@ export function OrderCard({ order }: { order: Order }) {
             Cancel
           </Button>
           {status === "pending" ? (
-            <Button className="rounded-full" onClick={finishOrder}>
+            <Button
+              className="rounded-full"
+              onClick={() => setIsReviewBoxOpen(true)}
+            >
               Finish Order
             </Button>
           ) : null}
         </CardFooter>
       </Card>
+
+      <Dialog
+        open={isReviewBoxOpen}
+        onOpenChange={() => setIsReviewBoxOpen(false)}
+      >
+        <DialogContent className="w-52 ">
+          <DialogHeader className="space-y-4">
+            <DialogTitle>Rate Crafter</DialogTitle>
+            <DialogDescription>
+              <Button onClick={submitReview}>Rate</Button>
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={isFinishBoxOpen}
+        onOpenChange={() => setIsFinishBoxOpen(false)}
+      >
+        <DialogContent className="w-56">
+          <DialogHeader className="space-y-4">
+            <DialogTitle>Finish Order</DialogTitle>
+            <DialogDescription>
+              <Button onClick={finishOrder}>Finish</Button>
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
