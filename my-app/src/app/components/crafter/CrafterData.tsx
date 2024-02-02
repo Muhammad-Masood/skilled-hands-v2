@@ -39,12 +39,12 @@ const CrafterData = ({ props }: { props: CrafterDataProps }) => {
         <strong className="text-lg">Reviews:</strong>
         <div className="flex gap-x-3">
         {
-          profile.reviews.map((rev: number,index: number) => (
+          profile.reviews?profile.reviews.map((rev: number,index: number) => (
             <div className="flex items-center gap-x-1" key={index}>
             <span>{rev}</span>
             <Star className="w-5 h-5" />
             </div>
-          ))
+          )):<p className="font-medium">No Reviews</p>
         }
         </div>
       </div>

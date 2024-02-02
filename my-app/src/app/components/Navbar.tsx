@@ -49,7 +49,7 @@ export function NavBar({ pannel }: { pannel: "crafter" | "main"}) {
                 <NavigationMenu key={index} orientation="horizontal">
                   <NavigationMenuList>
                     <NavigationMenuItem>
-                      <Link href={link.path} legacyBehavior passHref>
+                      <Link href={link.name.toLowerCase() === "you"?`/crafter/profile/${userId}`:link.path} legacyBehavior passHref>
                         <NavigationMenuLink
                           className={navigationMenuTriggerStyle()}
                         >
