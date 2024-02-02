@@ -18,7 +18,9 @@ export async function GET() {
   try {
     const ordersDetailsSnapshot = await getDocs(collection(db, "orders"));
     if (!ordersDetailsSnapshot.empty) {
-      const orderDetailsData = ordersDetailsSnapshot.docs.map((doc) => doc.data());
+      const orderDetailsData = ordersDetailsSnapshot.docs.map((doc) =>
+        doc.data()
+      );
       return NextResponse.json(orderDetailsData);
     } else {
       return NextResponse.json({ message: "No Order Details Found" });

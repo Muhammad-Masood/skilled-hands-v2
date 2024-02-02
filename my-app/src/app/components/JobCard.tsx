@@ -33,21 +33,28 @@ import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import toast from "react-hot-toast";
 import { useAuth } from "@clerk/nextjs";
 import { Star } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+
+export interface ProposalExtend extends Proposal {
+  crafterName: string;
+}
 
 interface JobCardProps {
   job: Job;
   isCrafterVerified?: boolean;
   isUserVerified?: boolean;
   variant: "small" | "large";
+  proposals?: ProposalExtend[];
 }
 
+
 export function JobCard({ props }: { props: JobCardProps }) {
-  const { job, variant, isCrafterVerified, isUserVerified } = props;
+  const { job, variant, isCrafterVerified, isUserVerified, proposals } = props;
   const { userId } = useAuth();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isViewProposalDialogOpen, setIsViewProposalDialogOpen] =
     useState(false);
-  const [proposals, setProposals] = useState<Proposal[] | undefined>(undefined);
   const [crafterData, setCrafterData] = useState<Crafter | undefined>(
     undefined
   );
@@ -81,42 +88,32 @@ export function JobCard({ props }: { props: JobCardProps }) {
   });
 
   const submitProposal = async (values: z.infer<typeof proposalFormSchema>) => {
-    toast.loading("Sending proposal...");
-    const alreadySubmitted: boolean = (
-      await axios.get(`/api/crafter/proposal/crafter/${userId}`)
-    ).data;
-    if (!alreadySubmitted) {
-      const response = await axios.post("/api/crafter/proposal", {
-        jobId: job.id,
-        crafterId: userId,
-        proposal: values.proposal,
-      });
-      if (response.status === 200) {
-        toast.success("Proposal sent successfully.");
-        toast.dismiss();
-      } else {
-        toast.error("Error sending proposal.");
-        toast.dismiss();
-      }
-    } else {
-      toast.error("You have already submitted the proposal.");
-      toast.dismiss()
-    }
-  };
-
-  const fetchProposals = async () => {
+    const toastId = toast.loading("Sending proposal...");
     try {
-      // proposals on this job Id
-      setIsViewProposalDialogOpen(true);
-      const _proposals: Proposal[] = (
-        await axios.get(`/api/crafter/proposal/${job.id}`)
+      const alreadySubmitted: boolean = (
+        await axios.get(`/api/crafter/proposal/crafter/${userId}`)
       ).data;
-      setProposals(_proposals);
-      toast.dismiss();
+      if (!alreadySubmitted) {
+        const response = await axios.post("/api/crafter/proposal", {
+          jobId: job.id,
+          crafterId: userId,
+          proposal: values.proposal,
+        });
+        if (response.status === 200) {
+          toast.success("Proposal sent successfully.");
+          // toast.dismiss();
+        } else {
+          toast.error("Error sending proposal.");
+          // toast.dismiss();
+        }
+      } else {
+        toast.error("You have already submitted the proposal.");
+        // toast.dismiss()
+      }
     } catch (error) {
-      toast.dismiss();
-      toast.error("Error fetching proposals.");
       console.log(error);
+    } finally {
+      toast.dismiss(toastId);
     }
   };
 
@@ -143,7 +140,8 @@ export function JobCard({ props }: { props: JobCardProps }) {
 
   const fetchAndSetCrafterData = async (crafterId: string) => {
     try {
-      const _crafterData:Crafter | null = (
+      toast.loading("Getting crafter data...");
+      const _crafterData: Crafter | null = (
         await axios.get(`/api/crafter/profile?id=${crafterId}`)
       ).data;
       console.log(_crafterData);
@@ -157,6 +155,7 @@ export function JobCard({ props }: { props: JobCardProps }) {
       }
       console.log("crafter avg rating: ", avgRating);
       setCrafterAvgRating(Number(avgRating.toFixed(2)));
+      toast.dismiss();
     } catch (error) {
       toast.error("Error fetching crafter data");
       console.log(error);
@@ -199,8 +198,8 @@ export function JobCard({ props }: { props: JobCardProps }) {
             <Button onClick={handleJobApply}>Apply</Button>
             <Button
               onClick={() => {
-                toast.loading("Getting proposals...");
-                fetchProposals();
+                setIsViewProposalDialogOpen(true);
+                proposals === null ? toast.error("No proposals yet.") : null;
               }}
             >
               View Proposals
@@ -264,26 +263,36 @@ export function JobCard({ props }: { props: JobCardProps }) {
         onOpenChange={() => setIsViewProposalDialogOpen(false)}
       >
         <DialogTrigger asChild />
-        <div className="space-y-3">
-        {proposals
-          ? proposals.map((proposal: Proposal, index: number) => (
-              <DialogContent key={index}>
-                <DialogHeader
-                  onClick={() => {
-                    router.push(
-                      "?" + createQueryString("hire", proposal.crafterId)
-                    );
-                    fetchAndSetCrafterData(proposal.crafterId);
-                  }}
-                  className="cursor-pointer hover:text-gray-700"
-                >
-                  <DialogTitle>CrafterId {proposal.crafterId}</DialogTitle>
-                  <DialogDescription>{proposal.proposal}</DialogDescription>
-                </DialogHeader>
-              </DialogContent>
-            ))
-          : null}
-          </div>
+        <DialogContent>
+          {/* <ScrollArea
+            className="h-[50px] w-[350px] rounded-md border p-4"
+          > */}
+            {/* <div> */}
+              {proposals
+                ? proposals.map((proposal: ProposalExtend, index: number) => (
+                    <div className="space-y-3" key={index}>
+                      <DialogHeader
+                        onClick={() => {
+                          router.push(
+                            "?" + createQueryString("hire", proposal.crafterId)
+                          );
+                          fetchAndSetCrafterData(proposal.crafterId);
+                        }}
+                        className="cursor-pointer hover:text-gray-700"
+                      >
+                        <DialogTitle>
+                          {proposal.crafterName}
+                        </DialogTitle>
+                        <DialogDescription>
+                          {proposal.proposal}
+                        </DialogDescription>
+                      </DialogHeader>
+                    </div>
+                  ))
+                : null}
+            {/* </div> */}
+          {/* </ScrollArea> */}
+        </DialogContent>
       </Dialog>
 
       <Dialog
@@ -306,13 +315,9 @@ export function JobCard({ props }: { props: JobCardProps }) {
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <Button
-                onClick={() =>
-                  router.replace(`/crafter/profile/${crafterData.id}`)
-                }
-              >
-                View Profile
-              </Button>
+              <Link href={`/crafter/profile/${crafterData.id}`} target="_blank">
+                <Button>View Profile</Button>
+              </Link>
               <Button onClick={hireCrafter}>Hire</Button>
             </DialogFooter>
           </DialogContent>

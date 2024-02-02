@@ -4,6 +4,7 @@ import {
   DocumentReference,
   collection,
   doc,
+  getDoc,
   getDocs,
   query,
   where,
@@ -20,7 +21,26 @@ export async function GET(
     const { jobId } = params;
     const q = query(collection(db, "proposals"), where("jobId", "==", jobId));
     const querySnapshot = await getDocs(q);
-    const proposals = querySnapshot.docs.map((doc) => doc.data());
+    const proposals = await Promise.all(
+      querySnapshot.docs.map(async (_doc) => {
+        const proposalData = _doc.data();
+
+        // Fetch crafter details using crafterId
+        const crafterDocRef = doc(db, "crafters", proposalData.crafterId);
+        const crafterDocSnapshot = await getDoc(crafterDocRef);
+
+        if (crafterDocSnapshot.exists()) {
+          const crafterData = crafterDocSnapshot.data();
+          return {
+            ...proposalData,
+            crafterName: crafterData.name, // Adjust this based on your crafter data structure
+          };
+        } else {
+          return proposalData; // Use the original proposal data if crafter data not found
+        }
+      })
+    );
+
     if (!querySnapshot.empty) {
       return NextResponse.json(proposals);
     } else {

@@ -22,15 +22,18 @@ import {
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useRouter, useSearchParams } from "next/navigation";
+import { OrderExtend } from "../()/orders/page";
 
-export function OrderCard({ order }: { order: Order }) {
-  const { crafterId, date, id, jobId, status, userId } = order;
+
+export function OrderCard({ order }: { order: OrderExtend }) {
+  const { crafterId, date, id, jobId, status, userId, crafterName } = order;
 
   const [isReviewBoxOpen, setIsReviewBoxOpen] = useState(false);
   const [isFinishBoxOpen, setIsFinishBoxOpen] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-
+  const formattedDate:Date = new Date(date.seconds*1000);
+  
   const cancelOrder = async () => {
     try {
       toast.loading("Cancelling order...");
@@ -49,6 +52,7 @@ export function OrderCard({ order }: { order: Order }) {
       await axios.patch(`/api/user/order?id=${id}`);
       toast.dismiss(loadToastId);
       toast.success("Order finished successfully");
+      router.replace('/orders');
     } catch (error) {
       toast.dismiss();
       toast.error("Error");
@@ -92,9 +96,9 @@ export function OrderCard({ order }: { order: Order }) {
               </p>
             </div>
             <div className="text-sm font-normal space-y-1">
-              <p>Crafter Id {crafterId}</p>
+              <p>Crafter - {crafterName}</p>
               <p>Job Id {jobId}</p>
-              <p>date</p>
+              <p>{formattedDate.toDateString()}</p>
             </div>
           </CardTitle>
           {/* <CardDescription className="">

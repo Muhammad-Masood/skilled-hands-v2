@@ -12,7 +12,7 @@ const DisplayJobs = async ({ jobsData }: { jobsData: Job[] }) => {
             <JobCard props={{job, variant: "small"}} key={job.id}/>
           ))
         ) : (
-          <p>No Jobs Available</p>
+          <p className="text-3xl">No Jobs Available</p>
         )}
       </div>
     </div>

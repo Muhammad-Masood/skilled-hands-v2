@@ -13,7 +13,12 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
   try {
     const domain = request.nextUrl.searchParams.get("domain");
-    const q = query(collection(db, "crafters"), where("domain", "==", domain));
+    // const q = query(collection(db, "crafters"), where("domain", "==", domain));
+    const startAt = domain;
+    const endAt = domain + '\uf8ff';
+    const q = query(collection(db, "crafters"), 
+                    where("domain", ">=", startAt), 
+                    where("domain", "<=", endAt));
     const querySnapshot = await getDocs(q);
     const crafters = querySnapshot.docs.map((doc) => doc.data());
     if (!querySnapshot.empty) {

@@ -38,5 +38,11 @@ export type Order = {
   userId: string;
   jobId: string;
   status: "pending" | "completed";
-  date: Date;
+  date: any;
+}
+
+export type post = {
+  id : string;
+  description: string;
+  image: string;
 }
