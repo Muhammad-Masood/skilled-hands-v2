@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import ReviewDetails from "@/app/(user)/Revdetails";
+import { ReviewDetails } from "@/lib/types";
 import { db } from "@/firebase";
 import { addDoc, collection, doc, documentId, getDoc } from "firebase/firestore";
 
