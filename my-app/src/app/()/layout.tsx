@@ -13,7 +13,7 @@ export default function RootLayout({
       <html lang="en">
         <body className="bg-gradient-to-l from-cyan-500 to-sky-100 h-full">
           <Toaster position="top-center"/>
-          <NavBar />
+          <NavBar pannel="main"/>
           {children}
         </body>
       </html>

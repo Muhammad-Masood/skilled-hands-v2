@@ -1,5 +1,5 @@
 import { ClerkProvider } from "@clerk/nextjs";
-import { NavBar } from "../components/crafter/Navbar";
+import { NavBar } from "@/app/components/Navbar";
 import "../globals.css";
 import { Toaster } from "react-hot-toast";
 export default function RootLayout({
@@ -12,7 +12,7 @@ export default function RootLayout({
       <ClerkProvider>
         <body className="bg-gradient-to-l from-cyan-500 to-sky-100 h-full">
           <Toaster position="top-center" />
-          <NavBar />
+          <NavBar pannel="crafter"/>
           {children}
         </body>
       </ClerkProvider>
