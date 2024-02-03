@@ -46,11 +46,9 @@ export function ProfileForm({initialProfileData, update}:{initialProfileData: Cr
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if(update){
       const response = await axios.patch("/api/crafter/profile",values);
-      console.log(response);
       toast.success("Profile Updated Successfully!");
     } else {
       const response = await axios.post("/api/crafter/profile", values);
-      console.log(response);
       toast.success("Profile Created Successfully!");
     }
   }

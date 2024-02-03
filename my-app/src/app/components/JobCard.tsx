@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ReactElement, useCallback, useState } from "react";
+import { ReactElement, useCallback, useEffect, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import * as z from "zod";
 import { proposalFormSchema } from "@/lib/schema";
@@ -58,10 +58,21 @@ export function JobCard({ props }: { props: JobCardProps }) {
   const [crafterData, setCrafterData] = useState<Crafter | undefined>(
     undefined
   );
+  const [hasSentProposal, setHasSentProposal] = useState<boolean | null>(null);
   const [crafterAvgRating, setCrafterAvgRating] = useState<number>(0);
   const router = useRouter();
   const searchParams = useSearchParams();
   const { title, desc, location, pay } = job;
+
+  useEffect(() => {
+    const fetchHasSentProposal = async () => {
+      const response = await axios.get(`/api/crafter/verify/proposal?id=${userId}&job_id=${job.id}`);
+      setHasSentProposal(response.data.hasSentProposal);
+    }
+    if(hasSentProposal === null){
+      fetchHasSentProposal()
+    };
+  }, []);
 
   const createQueryString = useCallback(
     (name: string, value: string) => {
@@ -195,7 +206,7 @@ export function JobCard({ props }: { props: JobCardProps }) {
             <p>Pay: {pay}</p>
           </CardContent>
           <CardFooter className="flex space-x-5">
-            <Button onClick={handleJobApply}>Apply</Button>
+            <Button onClick={handleJobApply} disabled={hasSentProposal!}>Apply</Button>
             <Button
               onClick={() => {
                 setIsViewProposalDialogOpen(true);

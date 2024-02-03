@@ -25,4 +25,4 @@ export const verifyUser = async (userId: string) => {
     console.log(error);
   }
 };
- 
+

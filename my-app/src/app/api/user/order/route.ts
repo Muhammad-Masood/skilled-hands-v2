@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function PATCH(request: NextRequest) {
+export  async function PATCH(request: NextRequest) {
   try {
     const id = request.nextUrl.searchParams.get("id");
     if (id) {

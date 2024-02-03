@@ -13,34 +13,26 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { usePathname } from "next/navigation";
 
 export function Hero() {
   const [search, setSearch] = useState("");
   const [searchResults, setSearchResults] = useState<Crafter[]>([]);
+  const pathName = usePathname();
 
   const handleSearch = async () => {
-    console.log(search);
+    const toastId: string = toast.loading("Getting crafters based on domain...");
     try {
-      toast.loading("Getting crafters based on domain...");
-      // const response: Crafter[] = (
-      //   await axios.get(`/api/crafter/domain?domain=${search}`)
-      // ).data;
-      setSearchResults([
-        {
-          id: "",
-          name: "",
-          bio: "",
-          domain: "",
-          location: "",
-          contact: "",
-          reviews: [2, 3],
-        },
-      ]);
-      toast.dismiss();
-      toast.success("Scroll down for the results.");
+      const response: Crafter[] = (
+        await axios.get(`/api/crafter/domain?domain=${search}`)
+      ).data;
+      setSearchResults(response);
+      response!==null?toast.success("Scroll down for the results."):toast.error("No Crafter found.");
     } catch (error) {
       toast.error("Error searching domain.");
       console.log(error);
+    } finally {
+      toast.dismiss(toastId);
     }
   };
 
@@ -87,19 +79,20 @@ export function Hero() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {searchResults &&
-            searchResults.map((crafter: Crafter, index: number) => (
-              <Card className="m-4 md:m-2 lg:m-20 opacity-80" key={index}>
-                <CardHeader>
-                  <CardTitle>{crafter.name}</CardTitle>
-                  <CardDescription className="space-y-2">
-                    <p>{crafter.domain}</p>
-                    <p>{crafter.location}</p>
-                    <p>{crafter.contact}</p>
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-            ))}
+        {searchResults && (
+          searchResults.map((crafter:Crafter, index:number) => (
+            <Card className="m-4 md:m-2 lg:m-20 opacity-80" key={index}>
+            <CardHeader>
+              <CardTitle>{crafter.name}</CardTitle>
+              <CardDescription className="space-y-2">
+                <p>{crafter.domain}</p>
+                <p>{crafter.location}</p>
+                <p>{crafter.contact}</p>
+                </CardDescription>
+            </CardHeader>
+          </Card>
+          ))
+        )}
         </div>
       </div>
     </>
