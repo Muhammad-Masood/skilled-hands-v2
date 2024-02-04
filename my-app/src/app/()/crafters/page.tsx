@@ -17,8 +17,8 @@ const page = async () => {
       <p className="text-3xl">Explore Crafters</p>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 lg:p-0">
         {crafters.map((crafter: Crafter, index: number) => (
-          <Link href={`/crafter/profile/${crafter.id}`} className="">
-            <Card className="opacity-80" key={index}>
+          <Link href={`/crafter/profile/${crafter.id}`} className="" key={index}>
+            <Card className="opacity-80">
               <CardHeader>
                 <CardTitle>{crafter.name}</CardTitle>
                 <CardDescription className="space-y-2">
