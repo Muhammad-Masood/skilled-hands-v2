@@ -13,9 +13,13 @@ import {
 } from "firebase/firestore";
 import { NextRequest, NextResponse } from "next/server";
 
-// http://localhost:3000/api/crafter/proposal
+/**
+ * POST {BASE_URL}/api/crafter/proposal
+ * stores the proposal of the crafter on a particular job.
+ * GET => {BASE_URL}/api/crafter/proposal?id={proposal_id}
+ * returns the proposal based upon the id provided
+ */
 
-// Submit Job Proposal
 export async function POST(request: NextRequest) {
   try {
     const proposalBody: Proposal = await request.json();
@@ -48,18 +52,17 @@ export async function GET(request: NextRequest) {
       const proposalDocRef: DocumentReference<DocumentData, DocumentData> = doc(
         db,
         "proposals",
-        id,
+        id
       );
       const proposalsData: DocumentSnapshot<DocumentData, DocumentData> =
         await getDoc(proposalDocRef);
-      console.log(proposalsData.data());
       if (proposalsData.exists()) {
         return NextResponse.json(proposalsData.data());
       } else {
-        return NextResponse.json({ message: "No Job Details Found" });
+        return NextResponse.json({ message: "No Proposal Found" });
       }
     } else {
-      return NextResponse.json({ error: "Job id not found :/" });
+      return NextResponse.json({ error: "Proposal id not found :/" });
     }
   } catch (error) {
     console.log(error);

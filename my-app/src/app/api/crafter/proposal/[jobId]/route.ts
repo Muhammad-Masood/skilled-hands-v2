@@ -11,7 +11,10 @@ import {
 } from "firebase/firestore";
 import { NextRequest, NextResponse } from "next/server";
 
-// /api/crafter/proposal/[jobId]
+/**
+ * GET => {BASE_URL}/api/crafter/proposal/{jobId}
+ * @returns all proposals on a particular job
+ */
 
 export async function GET(
   request: NextRequest,

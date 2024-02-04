@@ -3,6 +3,11 @@ import { auth } from "@clerk/nextjs";
 import { collection, getDoc, getDocs, query, where } from "firebase/firestore";
 import { NextRequest, NextResponse } from "next/server";
 
+/**
+ * GET => {BASE_URL}/api/user/verify?id={userId}
+ * verify if the user has posted a job or not
+ */
+
 export async function GET(request: NextRequest) {
   try {
     const userId = request.nextUrl.searchParams.get("id");

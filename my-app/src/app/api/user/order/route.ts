@@ -14,7 +14,17 @@ import {
 } from "firebase/firestore";
 import { NextRequest, NextResponse } from "next/server";
 
-// http://localhost:3000/api/user/order
+/**
+ * POST => {BASE_URL}/api/user/order
+ * stores the order details of the user.
+ * GET => {BASE_URL}/api/user/order?id={order_id}
+ * returns the order details based on the order id.
+ * PATCH => {BASE_URL}/api/user/order?id={order_id}
+ * updates the order status based on the order id.
+ * DELETE => {BASE_URL}/api/user/order?id={order_id}
+ * deletes the order based on the order id.
+ */
+
 
 // Order CRUD Operations
 

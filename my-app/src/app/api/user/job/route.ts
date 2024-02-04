@@ -14,7 +14,16 @@ import {
 } from "firebase/firestore";
 import { NextRequest, NextResponse } from "next/server";
 
-// http://localhost:3000/api/user/job
+/**
+ * POST => {BASE_URL}/api/user/job
+ * stores the job details of the user.
+ * GET => {BASE_URL}/api/user/job?id={job_id}
+ * returns the job details based on the job id.
+ * PATCH => {BASE_URL}/api/user/job?id={job_id}
+ * updates the job details based on the job id.
+ * DELETE => {BASE_URL}/api/user/job?id={job_id}
+ * deletes the job based on the job id.
+ */
 
 // Job CRUD Operations
 
@@ -29,7 +38,7 @@ export async function POST(request: NextRequest) {
     const jobCollectionRef = collection(db, "jobs");
     const storeJobDetailsDocRef = await addDoc(
       jobCollectionRef,
-      jobDetailsData,
+      jobDetailsData
     );
     const jobDocRef = doc(db, "jobs", storeJobDetailsDocRef.id);
     const updateJobId = await updateDoc(jobDocRef, {
@@ -115,7 +124,7 @@ export async function DELETE(request: NextRequest) {
       const jobDocRef: DocumentReference<DocumentData, DocumentData> = doc(
         db,
         "jobs",
-        jobId,
+        jobId
       );
       await deleteDoc(jobDocRef);
       return NextResponse.json({ messag: `Deleted job with id ${jobId}` });

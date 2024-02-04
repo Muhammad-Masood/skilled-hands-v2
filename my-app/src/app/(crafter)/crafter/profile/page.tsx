@@ -30,7 +30,9 @@ const page = async () => {
       {userId ? (
         profileData == null ? (
           <div>
-            <h1 className="text-center">Create Profile </h1>
+            <h1 className="text-center text-3xl font-medium opacity-70">
+              Create Profile{" "}
+            </h1>
             <ProfileForm
               initialProfileData={emptyDefaultValues}
               update={false}

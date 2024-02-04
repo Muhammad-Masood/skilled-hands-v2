@@ -9,6 +9,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <title>Skilled Hands</title>
+      </head>
       <ClerkProvider>
         <body className="bg-gradient-to-l from-cyan-500 to-sky-100 h-full">
           <Toaster position="top-center" />

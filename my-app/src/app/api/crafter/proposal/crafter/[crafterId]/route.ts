@@ -10,7 +10,10 @@ import {
 } from "firebase/firestore";
 import { NextRequest, NextResponse } from "next/server";
 
-// /api/crafter/proposal/[crafterId]
+/**
+ * GET => {BASE_URL}/api/crafter/proposal/crafter/{crafterId}
+ * @returns TRUE if the crafter has submitted a proposal already else FALSE;
+ */
 
 export async function GET(
   request: NextRequest,

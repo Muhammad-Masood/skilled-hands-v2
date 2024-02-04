@@ -15,7 +15,7 @@ export default async function page(request: Request) {
     : [];
 
   return userId ? (
-    <div className="pt-5 px-20 ">
+    <div className="pt-5 px-20">
       <DisplayJobs jobsData={jobs} />
     </div>
   ) : (

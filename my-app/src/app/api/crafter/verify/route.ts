@@ -3,9 +3,11 @@ import { auth } from "@clerk/nextjs";
 import { collection, getDoc, getDocs, query, where } from "firebase/firestore";
 import { NextRequest, NextResponse } from "next/server";
 
-// {DOMAIN}/api/crafter/verify?id={userId}
-
-// verify the user is crafter or not
+/**
+ * GET => {DOMAIN}/api/crafter/verify?id={userId}
+ * verify the logged in user is crafter or not
+ * @returns userId if the user is crafter else undefined
+ */
 
 export async function GET(request: NextRequest) {
   try {

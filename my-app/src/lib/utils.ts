@@ -24,15 +24,19 @@ export const userNavLinks: NavbarLink[] = [
     path: "/jobs/create",
   },
   {
-    name: "View Jobs",
+    name: "Explore Jobs",
     path: "/jobs",
-  },
-  {
-    name: "Contact",
-    path: "/contact",
   },
   {
     name: "Orders",
     path: "/orders",
+  },
+  {
+    name: "Crafters",
+    path: "/crafters",
+  },
+  {
+    name: "Contact",
+    path: "/contact",
   },
 ];

@@ -15,6 +15,11 @@ import {
   arrayUnion,
 } from "firebase/firestore";
 
+/**
+ * PATCH => {BASE_URL}/api/user/review?id={crafter_id}&review={review}
+ * Updates the crafter profile with the user review submitted.
+ */
+
 export async function PATCH(request: NextRequest) {
   const msg = {
     message: "User review posted!",

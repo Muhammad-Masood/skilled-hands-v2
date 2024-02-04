@@ -35,7 +35,6 @@ import { useAuth } from "@clerk/nextjs";
 import { Star } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-
 export interface ProposalExtend extends Proposal {
   crafterName: string;
 }
@@ -47,7 +46,6 @@ interface JobCardProps {
   variant: "small" | "large";
   proposals?: ProposalExtend[];
 }
-
 
 export function JobCard({ props }: { props: JobCardProps }) {
   const { job, variant, isCrafterVerified, isUserVerified, proposals } = props;
@@ -66,12 +64,14 @@ export function JobCard({ props }: { props: JobCardProps }) {
 
   useEffect(() => {
     const fetchHasSentProposal = async () => {
-      const response = await axios.get(`/api/crafter/verify/proposal?id=${userId}&job_id=${job.id}`);
+      const response = await axios.get(
+        `/api/crafter/verify/proposal?id=${userId}&job_id=${job.id}`
+      );
       setHasSentProposal(response.data.hasSentProposal);
-    }
-    if(hasSentProposal === null){
-      fetchHasSentProposal()
     };
+    if (hasSentProposal === null) {
+      fetchHasSentProposal();
+    }
   }, []);
 
   const createQueryString = useCallback(
@@ -182,7 +182,7 @@ export function JobCard({ props }: { props: JobCardProps }) {
               <CardTitle className="text-nowrap overflow-hidden overflow-ellipsis">
                 {title}
               </CardTitle>
-              <CardDescription className="text-nowrap overflow-hidden overflow-ellipsis">
+              <CardDescription className="text-nowrap overflow-hidden overflow-ellipsis pt-2">
                 {desc}
               </CardDescription>
             </CardHeader>
@@ -190,7 +190,9 @@ export function JobCard({ props }: { props: JobCardProps }) {
               <p className="text-nowrap overflow-hidden overflow-ellipsis">
                 {location}
               </p>
-              <p>Pay: {pay}</p>
+              <p>
+                Budget - {pay} <span className="text-md font-semibold">RS</span>
+              </p>
             </CardContent>
             <CardFooter className="flex justify-between"></CardFooter>
           </Card>
@@ -199,17 +201,21 @@ export function JobCard({ props }: { props: JobCardProps }) {
         <Card className="w-[350px] bg-opacity-50 bg-sky-100 shadow-2xl duration-200">
           <CardHeader>
             <CardTitle className="">{title}</CardTitle>
-            <CardDescription className="">{desc}</CardDescription>
+            <CardDescription className="pt-2">{desc}</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="">{location}</p>
-            <p>Pay: {pay}</p>
+            <p>
+              Budget - {pay} <span className="text-md font-semibold">RS</span>
+            </p>
           </CardContent>
           <CardFooter className="flex space-x-5">
-            <Button onClick={handleJobApply} disabled={hasSentProposal!}>Apply</Button>
+            <Button onClick={handleJobApply} disabled={hasSentProposal!}>
+              Apply
+            </Button>
             <Button
               onClick={() => {
-                setIsViewProposalDialogOpen(true);
+                proposals!==null?setIsViewProposalDialogOpen(true):null;
                 proposals === null ? toast.error("No proposals yet.") : null;
               }}
             >
@@ -278,30 +284,26 @@ export function JobCard({ props }: { props: JobCardProps }) {
           {/* <ScrollArea
             className="h-[50px] w-[350px] rounded-md border p-4"
           > */}
-            {/* <div> */}
-              {proposals
-                ? proposals.map((proposal: ProposalExtend, index: number) => (
-                    <div className="space-y-3" key={index}>
-                      <DialogHeader
-                        onClick={() => {
-                          router.push(
-                            "?" + createQueryString("hire", proposal.crafterId)
-                          );
-                          fetchAndSetCrafterData(proposal.crafterId);
-                        }}
-                        className="cursor-pointer hover:text-gray-700"
-                      >
-                        <DialogTitle>
-                          {proposal.crafterName}
-                        </DialogTitle>
-                        <DialogDescription>
-                          {proposal.proposal}
-                        </DialogDescription>
-                      </DialogHeader>
-                    </div>
-                  ))
-                : null}
-            {/* </div> */}
+          {/* <div> */}
+          {proposals
+            ? proposals.map((proposal: ProposalExtend, index: number) => (
+                <div className="space-y-3" key={index}>
+                  <DialogHeader
+                    onClick={() => {
+                      router.push(
+                        "?" + createQueryString("hire", proposal.crafterId)
+                      );
+                      fetchAndSetCrafterData(proposal.crafterId);
+                    }}
+                    className="cursor-pointer hover:text-gray-700"
+                  >
+                    <DialogTitle>{proposal.crafterName}</DialogTitle>
+                    <DialogDescription>{proposal.proposal}</DialogDescription>
+                  </DialogHeader>
+                </div>
+              ))
+            : null}
+          {/* </div> */}
           {/* </ScrollArea> */}
         </DialogContent>
       </Dialog>

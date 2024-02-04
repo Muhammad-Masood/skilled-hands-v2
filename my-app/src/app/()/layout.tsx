@@ -11,6 +11,9 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
+        <head>
+          <title>Skilled Hands</title>
+        </head>
         <body className="bg-gradient-to-l from-cyan-500 to-sky-100 h-full">
           <Toaster position="top-center"/>
           <NavBar pannel="main"/>

@@ -12,7 +12,10 @@ import {
 } from "firebase/firestore";
 import { NextRequest, NextResponse } from "next/server";
 
-// http://localhost:3000/api/user/orders/[jobId]
+/**
+ * GET => {BASE_URL}/api/user/orders/{userId}
+ * returns all orders of a specific user.
+ */
 
 // View All Orders Of Specific User
 export async function GET(

@@ -1,7 +1,7 @@
 export default function page() {
   return (
-    <div className="container mx-auto mt-10 p-8">
-      <p className="text-3xl font-bold mb-6">Contact Us</p>
+    <div className="container mx-auto mt-10 p-8 px-[6rem]">
+      <p className="text-3xl font-bold mb-[3rem]">Contact Us</p>
       <p className="mb-4">
         Feel free to reach out to us using the contact details below:
       </p>

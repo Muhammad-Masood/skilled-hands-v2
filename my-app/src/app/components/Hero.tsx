@@ -21,13 +21,17 @@ export function Hero() {
   const pathName = usePathname();
 
   const handleSearch = async () => {
-    const toastId: string = toast.loading("Getting crafters based on domain...");
+    const toastId: string = toast.loading(
+      "Getting crafters based on domain..."
+    );
     try {
       const response: Crafter[] = (
         await axios.get(`/api/crafter/domain?domain=${search}`)
       ).data;
       setSearchResults(response);
-      response!==null?toast.success("Scroll down for the results."):toast.error("No Crafter found.");
+      response !== null
+        ? toast.success("Scroll down for the results.")
+        : toast.error("No Crafter found.");
     } catch (error) {
       toast.error("Error searching domain.");
       console.log(error);
@@ -40,14 +44,14 @@ export function Hero() {
     <>
       <div className="flex flex-wrap pt-2">
         <div className="lg:w-3/6 w-full sm:p-2 h-full flex items-center justify-center px-4 md:items-start md:justify-start md:p-20 flex-col ">
-          <h1 className="md:text-6xl text-2xl sm:text-2xl font-extrabold mb-4 text-black">
+          <h1 className="md:text-6xl text-2xl sm:text-2xl font-extrabold mb-4 text-black lg:text-left text-center ">
             Empovering <span className="text-indigo-600"> Skills </span>{" "}
             Transforming <span className="text-indigo-600"> Lives.</span>{" "}
           </h1>
-          <p className="md:text-lg sm:text-sm text-xs mb-10 text-gray-400">
+          <p className="md:text-lg sm:text-sm text-xs mb-10 text-gray-500">
             Hire the most experienced workers in your area!
           </p>
-          <div className="lg:bg-white flex-col mb-6 w-full md:px-4 py-4 flex sm:flex-row items-center justify-center">
+          <div className="lg:bg-white flex-col mb-6 w-full md:px-4 py-2 flex sm:flex-row items-center justify-center gap-y-3">
             <Search className="text-2xl text-indigo-600 mx-2 hidden sm:flex" />
             <input
               onChange={(e) => setSearch(e.target.value)}
@@ -62,7 +66,7 @@ export function Hero() {
               Search
             </button>
           </div>
-          <div className=" w-full px-2 flex items-center justify-start flex-wrap">
+          <div className=" w-full px-6 flex items-center justify-start flex-wrap">
             <div className="flex items-center justify-center">
               <BookmarkCheck className="text-indigo-600 text-xl mx-2" />
               <h1 className="font-semibold text-lg">Suggested : </h1>
@@ -78,21 +82,20 @@ export function Hero() {
           <Image width={600} height={700} src="/worker.png" alt="hero-img" />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {searchResults && (
-          searchResults.map((crafter:Crafter, index:number) => (
-            <Card className="m-4 md:m-2 lg:m-20 opacity-80" key={index}>
-            <CardHeader>
-              <CardTitle>{crafter.name}</CardTitle>
-              <CardDescription className="space-y-2">
-                <p>{crafter.domain}</p>
-                <p>{crafter.location}</p>
-                <p>{crafter.contact}</p>
-                </CardDescription>
-            </CardHeader>
-          </Card>
-          ))
-        )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 lg:p-0">
+          {searchResults &&
+            searchResults.map((crafter: Crafter, index: number) => (
+              <Card className="m-4 md:m-2 lg:m-20 opacity-80" key={index}>
+                <CardHeader>
+                  <CardTitle>{crafter.name}</CardTitle>
+                  <CardDescription className="space-y-2">
+                    <p>{crafter.domain}</p>
+                    <p>{crafter.location}</p>
+                    <p>{crafter.contact}</p>
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            ))}
         </div>
       </div>
     </>
