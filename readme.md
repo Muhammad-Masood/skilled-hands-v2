@@ -64,3 +64,5 @@ Clients and crafters negotiate and agree upon a milestone, which can be placed a
   Clients can provide brief feedback on the platform, offering suggestions for the worker's improvement and skill enhancement.
 
 This feedback system enhances transparency and helps new customers make informed decisions about skilled workers.
+
+![alt text](<Diagram Job Feedback (1).jpg>)
