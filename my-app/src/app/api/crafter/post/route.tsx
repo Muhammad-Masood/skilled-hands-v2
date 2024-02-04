@@ -1,32 +1,66 @@
-// import { db } from "@/firebase";
-// import { Crafter, post } from "@/lib/types";
-// import { doc ,getDocs ,getDoc,setDoc ,updateDoc, collection  } from "firebase/firestore";
-// import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/firebase";
+import { Crafter, Post } from "@/lib/types";
+import {
+  doc,
+  getDocs,
+  getDoc,
+  setDoc,
+  updateDoc,
+  collection,
+  addDoc,
+  query,
+  where,
+} from "firebase/firestore";
+import { NextRequest, NextResponse } from "next/server";
 
 // /**
-//  * GET => {BASE_URL}/api/crafter/post
+//  * GET => {BASE_URL}/api/crafter/post?id={crafter_id}
 //  * POST => {BASE_URL}/api/crafter/post
+//  * PATCH => {BASE_URL}/api/crafter/post
 // **/
-// export async function POST(request: NextRequest) {
-//       try {  
-//         const data: post = await request.json();
-//         console.log(data);
-//         const dataDocumentReference = doc(db, 'images', data.id);
-//         await setDoc(dataDocumentReference, data);
-  
-//         return NextResponse.json({ message: 'Image uploaded successfully' });
-//       } catch (error) {
-//         console.error('Error uploading image:', error);
-//         return NextResponse.json({ error: 'Internal Server Error' });
-//       }
-//     }
-   
+
+export async function POST(request: NextRequest) {
+  try {
+    const postData: Post = await request.json();
+    const postCollectionRef = collection(db, "posts");
+    const postDetailsDocRef = await addDoc(postCollectionRef, postData);
+    const postDocRef = doc(db, "posts", postDetailsDocRef.id);
+    await updateDoc(postDocRef, {
+      id: postDetailsDocRef.id,
+    });
+
+    return NextResponse.json({ message: "Post uploaded successfully" });
+  } catch (error) {
+    console.error("Error posting..", error);
+    return NextResponse.json({ error: "Something went wrong:/" });
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const crafterId: string = request.nextUrl.searchParams.get("id") as string;
+    if (crafterId != "") {
+      const q = query(
+        collection(db, "posts"),
+        where("crafterId", "==", crafterId)
+      );
+      const querySnapshot = await getDocs(q);
+      const posts = querySnapshot.docs.map((doc) => doc.data());
+      return NextResponse.json(posts);
+    } else {
+      return NextResponse.json({ error: "Crafter id not found :/" });
+    }
+  } catch (error) {
+    console.error("Error fetching images:", error);
+    return NextResponse.json({ error: "Internal Server Error" });
+  }
+}
 
 // export async function PATCH(request: NextRequest) {
 //       try {
 //         const data: post = await request.json();
 //         console.log(data);
-  
+
 //         const { id, ...updateimage } = data;
 //         const dataDocumentReference = doc(db, 'images', id);
 //         const existingDataSnapshot = await getDoc(dataDocumentReference);
@@ -42,19 +76,4 @@
 //         console.error('Error updating image:', error);
 //         return NextResponse.json({ error: 'Internal Server Error' });
 //       }
-//   }
-
-// export async function GET(request: NextRequest) {
-//       try {
-//         const imagesCollection = collection(db, 'images');
-//         const imagesSnapshot = await getDocs(imagesCollection);
-  
-//         const images = imagesSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-  
-//         return NextResponse.json(images);
-//       } catch (error) {
-//         console.error('Error fetching images:', error);
-//         return NextResponse.json({ error: 'Internal Server Error' });
-//       }
-  
 //   }

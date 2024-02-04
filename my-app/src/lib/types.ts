@@ -47,10 +47,11 @@ export type Order = {
   jobId: string;
   status: "pending" | "completed";
   date: any;
-}
+};
 
-export type post = {
-  id : string;
+export type Post = {
+  id: string;
+  crafterId: string;
+  title: string;
   description: string;
-  image: string;
-}
+};
