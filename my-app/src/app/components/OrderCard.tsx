@@ -24,7 +24,6 @@ import { Input } from "@/components/ui/input";
 import { useRouter, useSearchParams } from "next/navigation";
 import { OrderExtend } from "../()/orders/page";
 
-
 export function OrderCard({ order }: { order: OrderExtend }) {
   const { crafterId, date, id, jobId, status, userId, crafterName } = order;
 
@@ -32,8 +31,8 @@ export function OrderCard({ order }: { order: OrderExtend }) {
   const [isFinishBoxOpen, setIsFinishBoxOpen] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const formattedDate:Date = new Date(date.seconds*1000);
-  
+  const formattedDate: Date = new Date(date.seconds * 1000);
+
   const cancelOrder = async () => {
     try {
       toast.loading("Cancelling order...");
@@ -52,7 +51,7 @@ export function OrderCard({ order }: { order: OrderExtend }) {
       await axios.patch(`/api/user/order?id=${id}`);
       toast.dismiss(loadToastId);
       toast.success("Order finished successfully");
-      router.replace('/orders');
+      router.replace("/orders");
     } catch (error) {
       toast.dismiss();
       toast.error("Error");
@@ -64,9 +63,7 @@ export function OrderCard({ order }: { order: OrderExtend }) {
     try {
       toast.loading("Posting your review...");
       await axios.patch(
-        `/api/user/review?id=${crafterId}&review=${searchParams.get(
-          `rating`
-        )}`
+        `/api/user/review?id=${crafterId}&review=${searchParams.get(`rating`)}`
       );
       toast.success("Thanks for the feedback...");
       setIsFinishBoxOpen(true);
@@ -107,9 +104,12 @@ export function OrderCard({ order }: { order: OrderExtend }) {
           </CardDescription> */}
         </CardHeader>
         <CardFooter className="gap-x-4">
-          <Button className="rounded-full" onClick={cancelOrder}>
-            Cancel
-          </Button>
+          {order.status === "pending" ? (
+            <Button className="rounded-full" onClick={cancelOrder}>
+              Cancel
+            </Button>
+          ) : null}
+
           {status === "pending" ? (
             <Button
               className="rounded-full"
